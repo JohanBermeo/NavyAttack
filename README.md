@@ -13,7 +13,7 @@ NavyAttack es una implementación moderna del tradicional juego de batalla naval
 - **Jugador vs Jugador**: Modo multijugador local para dos personas
 
 ### Especificaciones del Tablero
-- **Dimensiones**: 20x20 casillas
+- **Dimensiones**: 10x10 casillas
 - **Total de barcos por jugador**: 10 unidades
 
 ### Flota Naval
@@ -124,7 +124,8 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 
 ## 👥 Autores
 
-- **Tu Nombre** - *Desarrollo inicial* - [TuUsuario](https://github.com/tuusuario)
+- **Juan Manuel Otálora Hernández** - [Otalorah](https://github.com/Otalorah)
+- **Johan Stevan Bermeo Buitrago** - [JohanBermeo](https://github.com/JohanBermeo)
 
 ## 🙏 Agradecimientos
 
