@@ -2,182 +2,174 @@ classDiagram
     class NavyAttack {
         +main(String[] args)
     }
-    
-    %% Controladores
-    class GameController {
-        -Game game
-        -GameView gameView
-        -PlayerController player1Controller
-        -PlayerController player2Controller
-        -AIController aiController
-        +GameController()
-        +startNewGame()
-        +switchTurn()
-        +processAttack(int x, int y)
-        +checkGameOver() boolean
-        +restartGame()
-    }
-    
-    class PlayerController {
-        -Player player
-        +PlayerController(Player player)
-        +placeShip(Ship ship, Position position, boolean horizontal) boolean
-        +makeAttack(int x, int y) AttackResult
-        +isValidPlacement(Ship ship, Position position, boolean horizontal) boolean
-    }
-    
-    class AIController {
-        -Player aiPlayer
-        -DifficultyLevel difficulty
-        -List~Position~ targetQueue
-        +AIController(Player aiPlayer)
-        +makeSmartAttack() Position
-        +calculateNextTarget() Position
-        +setDifficulty(DifficultyLevel level)
+
+    %% Controladores◘
+    namespace Controller {
+        class GameController {
+            -Game game
+            -GameView gameView
+            +GameController()
+            
+        }
+        
+        class PlayerController {
+            -Player player
+            +savePlayer()    
+                
+        }
     }
     
     %% Modelos
-    class Game {
-        -Player player1
-        -Player player2
-        -Player currentPlayer
-        -GameState state
-        -int turnCount
-        +Game()
-        +initializeGame()
-        +switchPlayer()
-        +getCurrentPlayer() Player
-        +getOpponent() Player
-        +isGameOver() boolean
-        +getWinner() Player
+    namespace Model {
+        class Game {
+            -Player player1
+            -Player player2
+            -Player currentPlayer
+            -GameState state
+            -int turnCount
+            +startNewGame()
+            +switchTurn()
+            +processAttack(int x, int y)
+            +restartGame()
+            +Game()
+            +getCurrentPlayer() Player
+            +isGameOver() boolean
+            +getWinner() Player
+        }
+        
+        class Player {
+            -String name
+            -Board ownBoard
+            -Board attackBoard
+            -List~Ship~ fleet
+            -int shipsRemaining
+            -boolean isAI
+            +Player(String name, boolean isAI)
+            +placeShip(Ship ship, Position position, boolean horizontal) boolean
+            +receiveAttack(Position position) AttackResult
+            +attack(Position position, Player opponent) AttackResult
+            +hasLost() boolean
+            +getShipsRemaining() int
+        }
+        
+        class Board {
+            -Cell[][] grid
+            -int size
+            +Board(int size)
+            +getCell(int x, int y) Cell
+            +setCell(int x, int y, Cell cell)
+            +isValidPosition(int x, int y) boolean
+            +canPlaceShip(Position position, int size, boolean horizontal) boolean
+            +placeShip(Ship ship, Position position, boolean horizontal) boolean
+            +getAllShipsSunk() boolean
+        }
+        
+        class Ship {
+            -String name
+            -int size
+            -ShipType type
+            -List~Position~ positions
+            -int hitCount
+            -boolean isSunk
+            +Ship(String name, int size, ShipType type)
+            +hit()
+            +isSunk() boolean
+            +getSize() int
+            +getType() ShipType
+            +getPositions() List~Position~
+            +setPositions(List~Position~ positions)
+        }
+        
+        class Position {
+            -int x
+            -int y
+            +Position(int x, int y)
+            +getX() int
+            +getY() int
+            +equals(Object obj) boolean
+            +toString() String
+        }
+        
+        class Cell {
+            -CellState state
+            -Ship ship
+            +Cell()
+            +setState(CellState state)
+            +getState() CellState
+            +setShip(Ship ship)
+            +getShip() Ship
+            +hasShip() boolean
+        }
     }
-    
-    class Player {
-        -String name
-        -Board ownBoard
-        -Board attackBoard
-        -List~Ship~ fleet
-        -int shipsRemaining
-        -boolean isAI
-        +Player(String name, boolean isAI)
-        +placeShip(Ship ship, Position position, boolean horizontal) boolean
-        +receiveAttack(Position position) AttackResult
-        +attack(Position position, Player opponent) AttackResult
-        +hasLost() boolean
-        +getShipsRemaining() int
-    }
-    
-    class Board {
-        -Cell[][] grid
-        -int size
-        +Board(int size)
-        +getCell(int x, int y) Cell
-        +setCell(int x, int y, Cell cell)
-        +isValidPosition(int x, int y) boolean
-        +canPlaceShip(Position position, int size, boolean horizontal) boolean
-        +placeShip(Ship ship, Position position, boolean horizontal) boolean
-        +getAllShipsSunk() boolean
-    }
-    
-    class Ship {
-        -String name
-        -int size
-        -ShipType type
-        -List~Position~ positions
-        -int hitCount
-        -boolean isSunk
-        +Ship(String name, int size, ShipType type)
-        +hit()
-        +isSunk() boolean
-        +getSize() int
-        +getType() ShipType
-        +getPositions() List~Position~
-        +setPositions(List~Position~ positions)
-    }
-    
-    class Position {
-        -int x
-        -int y
-        +Position(int x, int y)
-        +getX() int
-        +getY() int
-        +equals(Object obj) boolean
-        +toString() String
-    }
-    
-    class Cell {
-        -CellState state
-        -Ship ship
-        +Cell()
-        +setState(CellState state)
-        +getState() CellState
-        +setShip(Ship ship)
-        +getShip() Ship
-        +hasShip() boolean
-    }
+
     
     %% %% Vistas
-    class GameView {
-        -BoardView player1BoardView
-        -BoardView player2BoardView
-        -MenuView menuView
-        -GameController controller
-        +GameView(GameController controller)
-        +showGameScreen()
-        +showMenu()
-        +updateBoards()
-        +displayMessage(String message)
-        +showWinnerDialog(Player winner)
+    namespace View {
+        class GameView {
+            -BoardView player1BoardView
+            -BoardView player2BoardView
+            -MenuView menuView
+            -GameController controller
+            +GameView(GameController controller)
+            +showGameScreen()
+            +showMenu()
+            +updateBoards()
+            +displayMessage(String message)
+            +showWinnerDialog(Player winner)
+        }
+        
+        class BoardView {
+            -JPanel boardPanel
+            -JButton[][] cellButtons
+            -Board board
+            +BoardView(Board board)
+            +updateBoard()
+            +highlightCell(int x, int y, Color color)
+            +addCellClickListener(ActionListener listener)
+            +showShips(boolean show)
+        }
+        
+        class MenuView {
+            -JFrame frame
+            -JButton newGameButton
+            -JButton vsAIButton
+            -JButton vsPlayerButton
+            -JButton exitButton
+            +MenuView()
+            +showMenu()
+            +addMenuListeners(GameController controller)
+        }
     }
-    
-    class BoardView {
-        -JPanel boardPanel
-        -JButton[][] cellButtons
-        -Board board
-        +BoardView(Board board)
-        +updateBoard()
-        +highlightCell(int x, int y, Color color)
-        +addCellClickListener(ActionListener listener)
-        +showShips(boolean show)
-    }
-    
-    class MenuView {
-        -JFrame frame
-        -JButton newGameButton
-        -JButton vsAIButton
-        -JButton vsPlayerButton
-        -JButton exitButton
-        +MenuView()
-        +showMenu()
-        +addMenuListeners(GameController controller)
-    }
+
     
     %% %% Enums
-    class ShipType {
-        <<enumeration>>
-        CARRIER
-        CRUISER
-        DESTROYER
-        SUBMARINE
-        +getSize() int
-        +getName() String
-    }
-    
-    class CellState {
-        <<enumeration>>
-        EMPTY
-        SHIP
-        HIT
-        MISS
-        SUNK
-    }
-    
-    class AttackResult {
-        <<enumeration>>
-        MISS
-        HIT
-        SUNK
-        ALREADY_ATTACKED
+    namespace Enums {
+        class ShipType {
+            <<enumeration>>
+            CARRIER
+            CRUISER
+            DESTROYER
+            SUBMARINE
+            +getSize() int
+            +getName() String
+        }
+        
+        class CellState {
+            <<enumeration>>
+            EMPTY
+            SHIP
+            HIT
+            MISS
+            SUNK
+        }
+        
+        class AttackResult {
+            <<enumeration>>
+            MISS
+            HIT
+            SUNK
+            ALREADY_ATTACKED
+        }
     }
     
     %% Relaciones
@@ -186,10 +178,10 @@ classDiagram
     GameController --> Game : manages
     GameController --> GameView : controls
     GameController --> PlayerController : uses
-    GameController --> AIController : uses
+    %% GameController --> AIController : uses
     
     PlayerController --> Player : controls
-    AIController --> Player : controls
+    %% AIController --> Player : controls
     
     Game --> Player : contains 2
     Player --> Board : has 2
@@ -197,7 +189,7 @@ classDiagram
     Board --> Cell : contains grid
     Cell --> Ship : may contain
     Ship --> Position : occupies
-    Ship --> ShipType : has type
+    %% Ship --> ShipType : has type
     
     GameView --> BoardView : contains 2
     GameView --> MenuView : contains
