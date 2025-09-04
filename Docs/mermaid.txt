@@ -2,49 +2,93 @@ classDiagram
     class NavyAttack {
         +main(String[] args)
     }
-
-    %% Controladores◘
+    
+    %% Controladores
     namespace Controller {
+
         class GameController {
             -Game game
             -GameView gameView
             +GameController()
-            
+            +startNewGame()
+            +switchTurn()
+            +processAttack(int x, int y)
+            +GameOver() 
         }
         
-        class PlayerController {
-            -Player player
-            +savePlayer()    
-                
+        class MenuController {
+            -User[] users
+            -DataManager<User> usersManager
+            -Authentication authenticator
+            +saveData(User user)
+            +loadData() User[]
+            +play()
         }
     }
     
     %% Modelos
     namespace Model {
+
+        class Authentication {
+            +login(String, String) boolean
+            +createAccount(String, String) User
+            -validateUserData(String, String, Date) void
+        }
+
+        class DataGame {
+            -User winner
+            -User[] users
+            -String timePlayed
+            +DataGame(User[] user, String winner, String timePlayed)
+            +getPlayers()  User[]
+        }
+
+        class User {
+            -String username
+            -String password
+            -DataGame[] history
+            +User(String username, String password)
+            +addGameInHistory(DataGame game)
+            +getHistory() dataGame[]
+        }
+
+        class DataManager~User~ {
+            -List~User~ users
+            +DataManager()
+            +setData(List~User~) void
+            +getData() List~User~
+            +addData(User) void
+            +deleteData(int) boolean
+            +findDataById(int) User
+            +getDataCount() int
+            +isEmpty() boolean
+            +clearData() void
+            +existsById(int) boolean
+        }
+
         class Game {
+            -Duration time
+            -int turnCount
+            -GameState state
             -Player player1
             -Player player2
             -Player currentPlayer
-            -GameState state
-            -int turnCount
-            +startNewGame()
-            +switchTurn()
-            +processAttack(int x, int y)
-            +restartGame()
             +Game()
+            +initializeGame()
+            +switchPlayer()
             +getCurrentPlayer() Player
             +isGameOver() boolean
-            +getWinner() Player
+            +attack(int x, int y, Player player)
+            +createDataGame() DataGame
         }
         
         class Player {
-            -String name
+            -User user
             -Board ownBoard
             -Board attackBoard
             -List~Ship~ fleet
             -int shipsRemaining
-            -boolean isAI
-            +Player(String name, boolean isAI)
+            +Player(User user)
             +placeShip(Ship ship, Position position, boolean horizontal) boolean
             +receiveAttack(Position position) AttackResult
             +attack(Position position, Player opponent) AttackResult
@@ -103,8 +147,9 @@ classDiagram
     }
 
     
-    %% %% Vistas
+    %% Vistas
     namespace View {
+
         class GameView {
             -BoardView player1BoardView
             -BoardView player2BoardView
@@ -140,10 +185,9 @@ classDiagram
             +addMenuListeners(GameController controller)
         }
     }
-
     
     %% %% Enums
-    namespace Enums {
+    namespace enums {
         class ShipType {
             <<enumeration>>
             CARRIER
@@ -171,34 +215,35 @@ classDiagram
             ALREADY_ATTACKED
         }
     }
+
     
     %% Relaciones
-    NavyAttack --> GameController : creates
+    NavyAttack --> MenuController : creates
+    MenuController --o Authentication
+    MenuController --o DataManager
+    MenuController --* MenuView
+    MenuController <--> GameController
+
+    DataManager --o User
+    User --> DataGame
+
+    GameController --> Game 
+    GameController --> GameView 
     
-    GameController --> Game : manages
-    GameController --> GameView : controls
-    GameController --> PlayerController : uses
-    %% GameController --> AIController : uses
+    Game --> Player 
+    Player --> Board 
     
-    PlayerController --> Player : controls
-    %% AIController --> Player : controls
+    Board --> Cell 
+    Cell --> Ship 
+    Ship --> Position
     
-    Game --> Player : contains 2
-    Player --> Board : has 2
+    GameView --> BoardView 
+    GameView --> GameController
     
-    Board --> Cell : contains grid
-    Cell --> Ship : may contain
-    Ship --> Position : occupies
-    %% Ship --> ShipType : has type
-    
-    GameView --> BoardView : contains 2
-    GameView --> MenuView : contains
-    GameView --> GameController : communicates
-    
-    BoardView --> Board : displays
+    BoardView --> Board 
     
     %% Agregaciones y composiciones
-    Game *-- Player : composition
-    Player *-- Board : composition
-    Board *-- Cell : composition
-    Ship o-- Position : aggregation
+    Game *-- Player 
+    Player *-- Board 
+    Board *-- Cell 
+    Ship o-- Position 
