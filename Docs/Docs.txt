@@ -1,9 +1,0 @@
-Sprites para los barcos: https://co.pinterest.com/pin/56295064088051346/
-
-- Gana el que destruye todos los barcos
-- Tablero 10x10
-- Papergames.io para muestra
-- Algoritmo para la maquina enemiga
-- Número limitado de ataques
-- 10 barcos
-- Se cambia de turno cuando es un ataque fallido
