@@ -35,22 +35,26 @@ El primer jugador que logre hundir completamente todos los barcos enemigos será
 
 - **Lenguaje**: Java
 - **Arquitectura**: MVC (Modelo-Vista-Controlador)
-- **Interfaz**: Java Swing / JavaFX (por definir)
+- **Interfaz**: JavaFX
 
 ## 🏗️ Arquitectura del Proyecto
 
 ```
 src/
 ├── controller/
+│   ├── MenuController.java
 │   ├── GameController.java
-│   ├── PlayerController.java
-│   └── AIController.java
 ├── model/
+│   ├── Authentication.java
+│   ├── DataManager.java
+│   ├── User.java
+│   ├── History.java
+│   ├── Position.java
 │   ├── Game.java
-│   ├── Board.java
-│   ├── Ship.java
 │   ├── Player.java
-│   └── Position.java
+│   ├── Board.java
+│   ├── Cell.java
+│   └── Ship.java
 ├── view/
 │   ├── GameView.java
 │   ├── BoardView.java
@@ -62,7 +66,7 @@ src/
 ## 🎮 Reglas del Juego
 
 1. **Preparación**:
-   - Cada jugador coloca sus 10 barcos en el tablero de 20x20
+   - Cada jugador coloca sus 10 barcos en el tablero de 10x10
    - Los barcos pueden colocarse horizontal o verticalmente
    - Los barcos no pueden superponerse ni tocarse
 
@@ -77,36 +81,35 @@ src/
 ## 🚀 Instalación y Ejecución
 
 ### Requisitos Previos
-- Java JDK 8 o superior
+- Java JDK 14 o superior
+- Maven 4
 - IDE compatible con Java (IntelliJ IDEA, Eclipse, VS Code, etc.)
 
 ### Pasos de Instalación
 
 1. **Clonar el repositorio**:
    ```bash
-   git clone https://github.com/tuusuario/NavyAttack.git
+   git clone https://github.com/JohanBermeo/NavyAttack.git
    cd NavyAttack
    ```
 
 2. **Compilar el proyecto**:
    ```bash
-   javac -d bin src/**/*.java
+   javac -d bin src/main/NavyAttack.java
    ```
 
 3. **Ejecutar el juego**:
    ```bash
-   java -cp bin main.NavyAttack
+   [Cambiarlo por el code de maven]
    ```
 
 ## 🎯 Características Planificadas
 
 - [ ] Interfaz gráfica intuitiva
-- [ ] IA con diferentes niveles de dificultad
-- [ ] Sistema de puntuación
 - [ ] Guardado y carga de partidas
-- [ ] Efectos de sonido y música
 - [ ] Estadísticas de jugador
-- [ ] Modo multijugador en red
+- [ ] Modo multijugador en local
+- [ ] Modo de juego vs Machine
 
 ## 🤝 Contribuciones
 
