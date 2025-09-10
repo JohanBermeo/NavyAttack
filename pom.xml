@@ -58,7 +58,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>main.NavyAttack</mainClass>
+                    <mainClass>com.navyattack.main.NavyAttack</mainClass>
                 </configuration>
             </plugin>
 
