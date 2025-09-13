@@ -1,8 +1,8 @@
 package com.navyattack.model;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Iterator;
+import java.util.ArrayList;
 
 public class DataManager {
 
@@ -10,7 +10,6 @@ public class DataManager {
     
     public DataManager() {
         this.users = new ArrayList<>();
-	this.users.add(new User("juan", "123"));
     }
     
     public void setUsers(List<User> data) {
@@ -25,7 +24,7 @@ public class DataManager {
         return this.users;
     }
     
-    public void addData(User user) {
+    public void addUser(User user) {
         if (user != null) {
             this.users.add(user);
         }
