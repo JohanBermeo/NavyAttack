@@ -2,22 +2,29 @@ package com.navyattack.controller;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import com.navyattack.model.User;
-import com.navyattack.view.LoginView;
-import com.navyattack.view.SignUpView;
-import com.navyattack.model.DataManager;
-import com.navyattack.model.Authentication;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
 import java.util.List;
+import java.util.ArrayList;
+
+import com.navyattack.model.User;
+import com.navyattack.view.MenuView;
+import com.navyattack.view.LoginView;
+import com.navyattack.view.SignUpView;
+import com.navyattack.model.DataManager;
+import com.navyattack.model.Authentication;
+
 
 public class MenuController {
     
+    private MenuView menuView;
     private LoginView loginView;
     private SignUpView signUpView;
+    private List<User> loggedUsers;
     private DataManager dataManager;
     
     private static final String DATA_DIR = "data";
@@ -26,6 +33,7 @@ public class MenuController {
     
     public MenuController() {
         this.dataManager = new DataManager();
+        this.loggedUsers = new ArrayList<>();
         loadUserData();
     }
     
@@ -83,7 +91,6 @@ public class MenuController {
         }
     }
     
-
     private void saveNewUser(User user) {
         dataManager.addUser(user);
         saveUserData();
@@ -104,6 +111,9 @@ public class MenuController {
         User user = dataManager.findUser(username);
         boolean result = Authentication.login(username, password, user);
         if (result) {
+	        if (!loggedUsers.contains(user)) {
+                loggedUsers.add(user);
+            }
             navigateToGameMenu();
             return true;
         } else {
@@ -111,7 +121,6 @@ public class MenuController {
         }
     }
     
-    // Método para manejar el registro - MODIFICADO para persistencia
     public boolean handleSignUp(String username, String password, String passwordConfirm) throws Exception {
         User existingUser = dataManager.findUser(username);
         
@@ -124,16 +133,39 @@ public class MenuController {
         
         if (registered instanceof User) {
             saveNewUser(registered);
+	        navigateToGameMenu();
             return true;
         }
         return false;
     }
     
-    // Método para navegar al menú del juego
     private void navigateToGameMenu() {
-        System.out.println("Navegando al menú del juego...");
+        Stage currentStage;
+        if (loginView != null && loginView.getScene() != null) {
+            currentStage = (Stage) loginView.getScene().getWindow();
+        } else if (signUpView != null && signUpView.getScene() != null) {
+            currentStage = (Stage) signUpView.getScene().getWindow();
+        } else {
+            return;
+        }
+        
+        this.menuView = new MenuView(this, new ArrayList<>(loggedUsers));
+        menuView.start(currentStage);
     }
     
+    // Método para permitir login de un segundo usuario
+    public void navigateToSecondUserLogin() {
+        Stage currentStage;
+        if (menuView != null && menuView.getScene() != null) {
+            currentStage = (Stage) menuView.getScene().getWindow();
+        } else {
+            return;
+        }
+        
+        this.loginView = new LoginView(this);
+        loginView.start(currentStage);
+    }
+
     public void navigateToSignUp() {
         Stage currentStage = (Stage) loginView.getScene().getWindow();
         this.signUpView = new SignUpView(this);
@@ -141,8 +173,42 @@ public class MenuController {
     }
     
     public void navigateToLogin() {
-        Stage currentStage = (Stage) signUpView.getScene().getWindow();
+        Stage currentStage;
+        if (signUpView != null && signUpView.getScene() != null) {
+            currentStage = (Stage) signUpView.getScene().getWindow();
+        } else if (menuView != null && menuView.getScene() != null) {
+            currentStage = (Stage) menuView.getScene().getWindow();
+        } else {
+            return;
+        }
+        
+        this.loginView = new LoginView(this);
         loginView.start(currentStage);
+    }
+
+    // Método para cerrar sesión de un usuario específico
+    public void logoutUser(User user) {
+        loggedUsers.remove(user);
+        // Si no quedan usuarios logueados, regresar al login
+        if (loggedUsers.isEmpty()) {
+            navigateToLogin();
+        } else {
+            // Actualizar MenuView con los usuarios restantes
+            navigateToGameMenu();
+        }
+    }
+    
+    // Getters para que las vistas puedan acceder a la información
+    public List<User> getLoggedUsers() {
+        return new ArrayList<>(loggedUsers);
+    }
+    
+    public boolean hasMultipleUsers() {
+        return loggedUsers.size() > 1;
+    }
+    
+    public boolean hasSingleUser() {
+        return loggedUsers.size() == 1;
     }
     
     // Clase interna para manejar el lanzamiento de la aplicación JavaFX

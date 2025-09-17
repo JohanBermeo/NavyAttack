@@ -1,26 +1,26 @@
 package com.navyattack.view;
 
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+import javafx.stage.Stage;
 import javafx.scene.Scene;
+import javafx.geometry.Pos;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
-import javafx.stage.Stage;
+import javafx.scene.layout.GridPane;
 
 import com.navyattack.controller.MenuController;
 
 public class LoginView {
 
 	private Scene scene;
-   private Text messageLabel;
+	private Text messageLabel;
 	private TextField usuarioField;
 	private MenuController controller;
-   private PasswordField passwordField;
+	private PasswordField passwordField;
 
 	// Constructor que recibe la referencia del controlador
 	public LoginView(MenuController controller) {
@@ -109,12 +109,10 @@ public class LoginView {
 		
 		boolean success = controller.handleLogin(username, password);
 		
-		if (success) {
-			UtilsMenuView.showMessage("Login successful", "success", messageLabel);
-		} else {
+		if (!success) {
 			UtilsMenuView.showMessage("Incorrect credentials", "error", messageLabel);
 			passwordField.clear();
-		}
+		} 
 	}
 	
 	// Método para manejar el evento de sign up
@@ -123,6 +121,6 @@ public class LoginView {
 	}
     
 	public Scene getScene() {
-    	return scene;
+		return scene;
 	}
 }

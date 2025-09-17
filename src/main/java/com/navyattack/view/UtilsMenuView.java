@@ -14,7 +14,7 @@ public class UtilsMenuView {
 			"-fx-font-weight: bold;" +
 			"-fx-background-radius: 5;"
 		);
-		button.setMaxWidth(Double.MAX_VALUE);
+		button.setMaxWidth(100);
 		
 		button.setOnMouseEntered(e -> 
 			button.setStyle(
