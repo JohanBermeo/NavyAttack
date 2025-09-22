@@ -73,7 +73,8 @@ public class LoginView {
 		
 		// Botón de Login con evento
 		Button btnLogin = new Button("Login");
-		UtilsMenuView.styleButton(btnLogin);
+		UtilsMenuView.styleButton(btnLogin, "black", "#333333", "white", "5px 0 5px 0");
+		btnLogin.setMaxWidth(Double.MAX_VALUE);
 		btnLogin.setOnAction(e -> handleLoginAction());
 
 		// Texto para crear cuenta

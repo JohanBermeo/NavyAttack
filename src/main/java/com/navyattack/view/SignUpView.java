@@ -81,7 +81,8 @@ public class SignUpView {
 		
 		// Botón de Sign Up con evento
 		Button btnSignUp = new Button("Sign up");
-		UtilsMenuView.styleButton(btnSignUp);
+		btnSignUp.setMaxWidth(Double.MAX_VALUE);
+		UtilsMenuView.styleButton(btnSignUp, "black", "#333333", "white", "5px 0 5px 0");
 		btnSignUp.setOnAction(e -> handleSignUpAction());
 
 		// Texto para sign in
