@@ -1,18 +1,32 @@
-package com.navyattack.model;
+package com.navyattack.model; 
 
-public class History {
-    
-	private String winner;
-	private User[] users;
-	private String timePlayed;
+import java.util.List; 
+import java.io.Serializable; 
 
-	public History(User[] users, String winner, String timePlayed) {
-		this.users = users;
-		this.winner = winner;
-		this.timePlayed = timePlayed;	
-	}
+public class History implements Serializable { 
 
-	public User[] getPlayers() {
-		return this.users;
-	}
-}
+    private static final long serialVersionUID = 1L; 
+
+    private String winner; 
+    private List<User> users; 
+    private String timePlayed; 
+
+    public History(List<User> users, String winner, String timePlayed) { 
+        this.users = users; 
+        this.winner = winner; 
+        this.timePlayed = timePlayed; 
+    } 
+
+    public List<User> getPlayers() { 
+        return this.users; 
+    } 
+
+    public String getWinner() { 
+        return this.winner; 
+
+    } 
+
+    public String getTimePlayed() { 
+        return this.timePlayed; 
+    } 
+} 

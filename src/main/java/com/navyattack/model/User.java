@@ -1,33 +1,36 @@
-package com.navyattack.model;
+package com.navyattack.model; 
 
-import java.io.Serializable;
+import java.util.List; 
+import java.util.ArrayList; 
+import java.io.Serializable; 
 
-public class User implements Serializable {
-    
-	private static final long serialVersionUID = 1L;
+public class User implements Serializable { 
 
-	History[] history;
-	private String username;
-	private String password;
+    private static final long serialVersionUID = 1L; 
 
-	public User(String username, String password) {
-		this.username = username;
-		this.password = password;	
-	}
+    private String username; 
+    private String password; 
+    private List<History> history; 
 
-	public void addHistory(History game) {
-		//this.history.add(game);
-	}
-	
-	public String getUsername() {
-		return this.username;
-	}
-	
-	public String getPassword() {
-		return this.password;
-	}
+    public User(String username, String password) { 
+        this.username = username; 
+        this.password = password; 
+        this.history = new ArrayList<>(); 
+    } 
 
-	public History[] getHistory() {
-		return this.history;
-	}
-}
+    public void addHistory(History game) { 
+        this.history.add(game); 
+    } 
+
+    public String getUsername() { 
+        return this.username; 
+    } 
+
+    public String getPassword() { 
+        return this.password; 
+    } 
+
+    public List<History> getHistory() { 
+        return this.history; 
+    } 
+} 

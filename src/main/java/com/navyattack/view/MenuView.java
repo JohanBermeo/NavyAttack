@@ -88,13 +88,19 @@ public class MenuView extends Application {
         Button historyBtn = new Button("History"); 
         historyBtn.setMaxWidth(125); 
         UtilsMenuView.styleButton(historyBtn, "black", "#333333", "white", "10px 0 10px 0"); 
-        GridPane.setHalignment(historyBtn, HPos.CENTER); 
+        historyBtn.setOnAction(e -> { 
+            controller.navigateToHistory(this.loggedUsers.get(0));
+        }); 
+	    GridPane.setHalignment(historyBtn, HPos.CENTER); 	
         grid.add(historyBtn, 0, 3, 1, 1); 
 
         Button logoutBtn = new Button("Log out"); 
         logoutBtn.setMaxWidth(125); 
         UtilsMenuView.styleButton(logoutBtn, "white", "#EDEDED", "black", "10px 0 10px 0"); 
-        GridPane.setHalignment(logoutBtn, HPos.CENTER); 
+        logoutBtn.setOnAction(e -> { 
+             controller.navigateToLogin();
+        }); 
+	    GridPane.setHalignment(logoutBtn, HPos.CENTER); 
         grid.add(logoutBtn, 0, 4, 1, 1); 
         mainPane.setCenter(grid); 
 

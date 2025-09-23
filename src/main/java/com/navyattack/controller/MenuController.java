@@ -15,6 +15,7 @@ import com.navyattack.model.User;
 import com.navyattack.view.MenuView;
 import com.navyattack.view.LoginView;
 import com.navyattack.view.SignUpView;
+import com.navyattack.view.HistoryView;
 import com.navyattack.model.DataManager;
 import com.navyattack.model.Authentication;
 
@@ -24,6 +25,7 @@ public class MenuController {
     private MenuView menuView;
     private LoginView loginView;
     private SignUpView signUpView;
+    private HistoryView historyView;
     private List<User> loggedUsers;
     private DataManager dataManager;
     
@@ -69,7 +71,6 @@ public class MenuController {
     private void saveUserData() {
         try {
             createDataDirectory();
-            
             List<User> users = dataManager.getUsers();
             
             try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(DATA_PATH))) {
@@ -94,6 +95,13 @@ public class MenuController {
     private void saveNewUser(User user) {
         dataManager.addUser(user);
         saveUserData();
+    }
+    
+    private void clearViewReferences() {
+        this.loginView = null;
+        this.signUpView = null;
+        this.historyView = null;
+        this.menuView = null;
     }
     
     // Método para inicializar la vista y pasarle la referencia del controlador
@@ -139,15 +147,22 @@ public class MenuController {
         return false;
     }
     
-    private void navigateToGameMenu() {
-        Stage currentStage;
+    public void navigateToGameMenu() {
+        Stage currentStage = null;
+        
         if (loginView != null && loginView.getScene() != null) {
             currentStage = (Stage) loginView.getScene().getWindow();
         } else if (signUpView != null && signUpView.getScene() != null) {
             currentStage = (Stage) signUpView.getScene().getWindow();
+	    } else if (historyView != null && historyView.getScene() != null) {
+	        currentStage = (Stage) historyView.getScene().getWindow();
+        } else if (menuView != null && menuView.getScene() != null) {
+            currentStage = (Stage) menuView.getScene().getWindow();
         } else {
             return;
         }
+        
+        clearViewReferences();
         
         this.menuView = new MenuView(this, new ArrayList<>(loggedUsers));
         menuView.start(currentStage);
@@ -162,18 +177,28 @@ public class MenuController {
             return;
         }
         
+        clearViewReferences();
         this.loginView = new LoginView(this);
         loginView.start(currentStage);
     }
 
     public void navigateToSignUp() {
         Stage currentStage = (Stage) loginView.getScene().getWindow();
+        clearViewReferences();
         this.signUpView = new SignUpView(this);
         signUpView.start(currentStage);
     }
+
+    public void navigateToHistory(User user) {
+        Stage currentStage = (Stage) menuView.getScene().getWindow();
+        clearViewReferences();
+        this.historyView = new HistoryView(this, user);
+        historyView.start(currentStage);
+    }
     
     public void navigateToLogin() {
-        Stage currentStage;
+        Stage currentStage = null;
+        
         if (signUpView != null && signUpView.getScene() != null) {
             currentStage = (Stage) signUpView.getScene().getWindow();
         } else if (menuView != null && menuView.getScene() != null) {
@@ -182,6 +207,7 @@ public class MenuController {
             return;
         }
         
+        clearViewReferences();
         this.loginView = new LoginView(this);
         loginView.start(currentStage);
     }
@@ -201,10 +227,6 @@ public class MenuController {
     // Getters para que las vistas puedan acceder a la información
     public List<User> getLoggedUsers() {
         return new ArrayList<>(loggedUsers);
-    }
-    
-    public boolean hasMultipleUsers() {
-        return loggedUsers.size() > 1;
     }
     
     public boolean hasSingleUser() {
