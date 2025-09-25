@@ -8,7 +8,6 @@ public class Board {
 
     private CellState[][] board;
     private List<Ship> ships;
-    private Orientation orientation;
 
     public Board() {
         board = new CellState[BOARD_SIZE][BOARD_SIZE];
@@ -36,35 +35,61 @@ public class Board {
     }
 
     public void placeShip(Ship selectedShip, int row, int col, int length, Orientation orientation) {
-        if (!canPlaceShipAt(row, col, length, Orientation.HORIZONTAL)) {
+        // Corregido: usar la orientación pasada como parámetro
+        if (!canPlaceShipAt(row, col, length, orientation)) {
             throw new IllegalArgumentException("Cannot place ship at the specified location");
         }
-        Ship ship = new Ship(row, col, length, orientation, false, new ArrayList<>(), 0, false);
-        ships.add(ship);
+
+        // Actualizar la posición del barco existente en lugar de crear uno nuevo
+        selectedShip.setRow(row);
+        selectedShip.setCol(col);
+        selectedShip.setOrientation(orientation);
+        selectedShip.setPlaced(true);
+
+        // Calcular y establecer las posiciones del barco
+        List<int[]> positions = new ArrayList<>();
         if (orientation == Orientation.HORIZONTAL) {
             for (int c = col; c < col + length; c++) {
                 board[row][c] = CellState.SHIP;
+                positions.add(new int[]{row, c});
             }
         } else {
             for (int r = row; r < row + length; r++) {
                 board[r][col] = CellState.SHIP;
+                positions.add(new int[]{r, col});
             }
         }
+
+        selectedShip.setPositions(positions);
+        ships.add(selectedShip);
     }
 
     public CellState getCellState(int row, int col) {
         return board[row][col];
     }
 
-    public void rotateCurrentShip() {
-
+    public List<Ship> getShips() {
+        return ships;
     }
 
-    public void selectShipToDeploy(ShipType shipType) {
+    // Método para actualizar visualmente el tablero (para futuras implementaciones)
+    public void updateBoard() {
+        // Limpiar tablero
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                if (board[i][j] == CellState.SHIP) {
+                    board[i][j] = CellState.EMPTY;
+                }
+            }
+        }
 
-    }
-
-    public void addListener() {
-
+        // Redibujar todos los barcos
+        for (Ship ship : ships) {
+            if (ship.isPlaced()) {
+                for (int[] pos : ship.getPositions()) {
+                    board[pos[0]][pos[1]] = CellState.SHIP;
+                }
+            }
+        }
     }
 }

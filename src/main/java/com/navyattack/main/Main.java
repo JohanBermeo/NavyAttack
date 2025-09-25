@@ -1,6 +1,8 @@
 package com.navyattack.main;
 
 import com.navyattack.controller.BoardController;
+import com.navyattack.model.Board;
+import com.navyattack.view.BoardView;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -20,11 +22,18 @@ public class Main extends Application {
             primaryStage.setResizable(false);
             primaryStage.centerOnScreen();
 
-            // Crear y mostrar el menú principal
-            BoardController boardController = new BoardController(primaryStage);
-            boardController.showBoard();
+            // Crear modelo y vista
+            Board board = new Board();
+            BoardView boardView = new BoardView();
 
-            System.out.println("Menu principal cargado exitosamente!");
+            // Crear controlador con modelo y vista
+            BoardController boardController = new BoardController(board, boardView);
+
+            // Mostrar la escena
+            primaryStage.setScene(boardView.getScene());
+            primaryStage.show();
+
+            System.out.println("Tablero cargado exitosamente!");
 
         } catch (Exception e) {
             System.err.println("Error al inicializar NavyAttack: " + e.getMessage());

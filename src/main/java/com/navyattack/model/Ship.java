@@ -3,9 +3,7 @@ package com.navyattack.model;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class Ship {
-
     private int row;
     private int col;
     private int length;
@@ -14,17 +12,19 @@ public class Ship {
     private List<int[]> positions;
     private int hits;
     private boolean sunk;
-    private boolean debloyable;
+    private boolean deployable;  // Corregido: era "debloyable"
     private boolean deploymentMode;
 
-    public Ship(int row, int col, int length, Orientation horizontal, boolean placed, List<int[]> positions, int hits, boolean sunk) {
+    public Ship(int row, int col, int length, Orientation orientation, boolean placed, List<int[]> positions, int hits, boolean sunk) {
         this.row = row;
         this.col = col;
-        this.orientation = Orientation.HORIZONTAL;
-        this.placed = false;
-        this.positions = new ArrayList<>();
-        this.hits = 0;
-        this.sunk = false;
+        this.length = length;
+        this.orientation = orientation; // Corregido: usar el parámetro
+        this.placed = placed; // Corregido: usar el parámetro
+        this.positions = positions != null ? positions : new ArrayList<>(); // Corregido: usar el parámetro
+        this.hits = hits; // Corregido: usar el parámetro
+        this.sunk = sunk; // Corregido: usar el parámetro
+        this.deployable = true; // Por defecto deployable
         this.deploymentMode = false;
     }
 
@@ -101,11 +101,10 @@ public class Ship {
     }
 
     public boolean isDeployable() {
-        return debloyable;
+        return deployable; // Corregido: era "debloyable"
     }
 
-    public void setDebloyable(boolean debloyable) {
-        this.debloyable = debloyable;
+    public void setDeployable(boolean deployable) { // Corregido: nombre del método
+        this.deployable = deployable;
     }
-
 }

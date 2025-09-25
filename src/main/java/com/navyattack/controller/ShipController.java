@@ -10,8 +10,12 @@ public class ShipController {
     private boolean isRotated = false;
     private Board board;
 
+    public ShipController(Board board) {
+        this.board = board;
+    }
+
     public void deployShip(Ship ship) {
-        if (ship != null && ship.isDeployable()){
+        if (ship != null && ship.isDeployable()) {
             selectedShip = ship;
             ship.setDeploymentMode(true);
         }
@@ -25,7 +29,7 @@ public class ShipController {
                 selectedShip.setOrientation(Orientation.VERTICAL);
             }
             isRotated = !isRotated;
-            updateShipView();
+            // updateShipView(); - Método que debería implementarse en la vista
         }
     }
 
@@ -39,5 +43,15 @@ public class ShipController {
         return false;
     }
 
+    public Ship getSelectedShip() {
+        return selectedShip;
+    }
 
+    public void setSelectedShip(Ship ship) {
+        this.selectedShip = ship;
+    }
+
+    public boolean isRotated() {
+        return isRotated;
+    }
 }
