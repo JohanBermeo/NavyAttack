@@ -1,7 +1,7 @@
 package com.navyattack.controller;
 
-import javafx.application.Application;
 import javafx.stage.Stage;
+import javafx.application.Application;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -26,7 +26,6 @@ public class MenuController {
     private LoginView loginView;
     private SignUpView signUpView;
     private HistoryView historyView;
-    private List<User> loggedUsers;
     private DataManager dataManager;
     
     private static final String DATA_DIR = "data";
@@ -35,7 +34,6 @@ public class MenuController {
     
     public MenuController() {
         this.dataManager = new DataManager();
-        this.loggedUsers = new ArrayList<>();
         loadUserData();
     }
     
@@ -119,8 +117,8 @@ public class MenuController {
         User user = dataManager.findUser(username);
         boolean result = Authentication.login(username, password, user);
         if (result) {
-	        if (!loggedUsers.contains(user)) {
-                loggedUsers.add(user);
+	        if (!dataManager.getLoggedUsers().contains(user)) {
+                dataManager.addLoggedUser(user);
             }
             navigateToGameMenu();
             return true;
@@ -141,6 +139,7 @@ public class MenuController {
         
         if (registered instanceof User) {
             saveNewUser(registered);
+	        dataManager.addLoggedUser(registered);
 	        navigateToGameMenu();
             return true;
         }
@@ -164,7 +163,7 @@ public class MenuController {
         
         clearViewReferences();
         
-        this.menuView = new MenuView(this, new ArrayList<>(loggedUsers));
+        this.menuView = new MenuView(this, dataManager.getLoggedUsers());
         menuView.start(currentStage);
     }
     
@@ -212,25 +211,24 @@ public class MenuController {
         loginView.start(currentStage);
     }
 
-    // Método para cerrar sesión de un usuario específico
+    // Método para cerrar sesión
     public void logoutUser(User user) {
-        loggedUsers.remove(user);
-        // Si no quedan usuarios logueados, regresar al login
-        if (loggedUsers.isEmpty()) {
+        dataManager.deleteLoggedUser(user);
+
+        if (dataManager.isLoggedEmpty()) {
             navigateToLogin();
         } else {
-            // Actualizar MenuView con los usuarios restantes
             navigateToGameMenu();
         }
     }
     
     // Getters para que las vistas puedan acceder a la información
     public List<User> getLoggedUsers() {
-        return new ArrayList<>(loggedUsers);
+        return dataManager.getLoggedUsers();
     }
     
     public boolean hasSingleUser() {
-        return loggedUsers.size() == 1;
+        return dataManager.getLoggedUsers().size() == 1;
     }
     
     // Clase interna para manejar el lanzamiento de la aplicación JavaFX

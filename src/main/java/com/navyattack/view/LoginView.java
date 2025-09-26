@@ -10,7 +10,9 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.FontWeight;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.BorderPane;
 
 import com.navyattack.controller.MenuController;
 
@@ -28,7 +30,14 @@ public class LoginView {
 	}
 	
 	public void start(Stage stage) {
-
+		if (controller.hasSingleUser()) {
+			createSecondUserInterface(stage);
+		} else {
+			createMainInterface(stage);
+		}
+	}
+	
+	private void createMainInterface(Stage stage) {
 		// Crear el contenedor principal
 		GridPane grid = new GridPane();
 		grid.setAlignment(Pos.CENTER);
@@ -42,6 +51,65 @@ public class LoginView {
 		GridPane.setHalignment(sceneTitle, javafx.geometry.HPos.CENTER);
 		grid.add(sceneTitle, 0, 0, 1, 1);
 		
+		VBox whiteContainer = createLoginContainer();
+		
+		grid.add(whiteContainer, 0, 1, 1, 10);
+		
+		// Crear y mostrar la escena
+		Scene scene = new Scene(grid, 500, 450);
+		scene.getRoot().setStyle("-fx-background-color: #5872C9;");
+		this.scene = scene;
+		stage.setTitle("Navy Attack - Login");
+		stage.setScene(scene);
+		stage.show();
+	}
+	
+	private void createSecondUserInterface(Stage stage) {
+
+		// Crear el contenedor principal
+		BorderPane root = new BorderPane();
+
+		// TopPanel fijo en la parte superior
+		VBox topPanel = new VBox(); 
+		topPanel.setAlignment(Pos.CENTER_LEFT); 
+		topPanel.setPadding(new Insets(15, 15, 15, 15)); 
+				
+		ImageView backArrow = UtilsMenuView.createImage("file:docs/Icons/png/flecha-pequena-izquierda.png"); 
+		backArrow.setStyle("-fx-cursor: hand;");                   
+		backArrow.setOnMouseClicked(e -> controller.navigateToGameMenu());
+
+		topPanel.getChildren().add(backArrow); 
+
+		// Grid para el contenido central
+		GridPane grid = new GridPane();
+		grid.setAlignment(Pos.TOP_CENTER);
+		grid.setVgap(10);
+		grid.setPadding(new Insets(25, 25, 0, 25));
+
+		// Título de la aplicación
+		Text sceneTitle = new Text("Navy Attack");
+		sceneTitle.setFont(Font.font("Tahoma", FontWeight.BOLD, 30));
+		GridPane.setHalignment(sceneTitle, javafx.geometry.HPos.CENTER);
+		grid.add(sceneTitle, 0, 0, 1, 1);
+
+		VBox whiteContainer = createLoginContainer();
+
+		grid.add(whiteContainer, 0, 1, 1, 1);
+
+		// Establecer las regiones del BorderPane
+		root.setTop(topPanel);
+		root.setCenter(grid);
+		root.setStyle("-fx-background-color: #C95858;");
+
+		// Crear y mostrar la escena
+		Scene scene = new Scene(root, 500, 500);
+		this.scene = scene;
+		stage.setTitle("Navy Attack");
+		stage.setScene(scene);
+		stage.show();
+	}
+	
+	private VBox createLoginContainer() {
 		VBox whiteContainer = new VBox(12);
 		whiteContainer.setStyle(
 			"-fx-pref-width: 250px;" +
@@ -77,9 +145,9 @@ public class LoginView {
 		btnLogin.setMaxWidth(Double.MAX_VALUE);
 		btnLogin.setOnAction(e -> handleLoginAction());
 
-		// Texto para crear cuenta
+		// Texto para crear cuenta (solo en interfaz principal)
 		Text createAccountText = new Text("Create account");
-		createAccountText.setOnMouseClicked(e -> handleSignUp());
+		createAccountText.setOnMouseClicked(e -> controller.navigateToSignUp());
 		UtilsMenuView.styleText(createAccountText);
 		
 		// Label para mensajes
@@ -92,15 +160,7 @@ public class LoginView {
 			btnLogin, createAccountText, messageLabel
 		);
 		
-		grid.add(whiteContainer, 0, 1, 1, 10);
-		
-		// Crear y mostrar la escena
-		Scene scene = new Scene(grid, 500, 450);
-		scene.getRoot().setStyle("-fx-background-color: #5872C9;");
-		this.scene = scene;
-		stage.setTitle("Navy Attack - Login");
-		stage.setScene(scene);
-		stage.show();
+		return whiteContainer;
 	}
 	
 	// Método para manejar el evento de login
@@ -116,11 +176,6 @@ public class LoginView {
 		} 
 	}
 	
-	// Método para manejar el evento de sign up
-	private void handleSignUp() {
-		controller.navigateToSignUp();
-	}
-    
 	public Scene getScene() {
 		return scene;
 	}
