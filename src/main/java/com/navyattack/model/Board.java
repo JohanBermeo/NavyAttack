@@ -9,6 +9,11 @@ public class Board {
     private CellState[][] board;
     private List<Ship> ships;
 
+    // Contadores de barcos disponibles y colocados
+    private int[] shipCounts = {1, 2, 3, 4}; // Portaaviones, Crucero, Destructor, Submarino
+    private int[] shipsPlaced = {0, 0, 0, 0};
+    private Ship selectedShip = null;
+
     public Board() {
         board = new CellState[BOARD_SIZE][BOARD_SIZE];
         for (int i = 0; i < BOARD_SIZE; i++) {
@@ -90,6 +95,68 @@ public class Board {
                     board[pos[0]][pos[1]] = CellState.SHIP;
                 }
             }
+        }
+    }
+
+    public Ship deployCarrier() {
+        if (canDeployShip(0)) {
+            selectedShip = new Ship(0, 0, 6, Orientation.HORIZONTAL, false, null, 0, false);
+            selectedShip.setDeployable(true);
+            return selectedShip;
+        }
+        return null;
+    }
+
+    public Ship deployCruiser() {
+        if (canDeployShip(1)) {
+            selectedShip = new Ship(0, 0, 4, Orientation.HORIZONTAL, false, null, 0, false);
+            selectedShip.setDeployable(true);
+            return selectedShip;
+        }
+        return null;
+    }
+
+    public Ship deployDestroyer() {
+        if (canDeployShip(2)) {
+            selectedShip = new Ship(0, 0, 3, Orientation.HORIZONTAL, false, null, 0, false);
+            selectedShip.setDeployable(true);
+            return selectedShip;
+        }
+        return null;
+    }
+
+    public Ship deploySubmarine() {
+        if (canDeployShip(3)) {
+            selectedShip = new Ship(0, 0, 2, Orientation.HORIZONTAL, false, null, 0, false);
+            selectedShip.setDeployable(true);
+            return selectedShip;
+        }
+        return null;
+    }
+
+    public boolean canDeployShip(int shipType) {
+        return (shipCounts[shipType] - shipsPlaced[shipType]) > 0;
+    }
+
+    public int[] getShipCounts() {
+        return shipCounts.clone();
+    }
+
+    public int[] getShipsPlaced() {
+        return shipsPlaced.clone();
+    }
+
+    public Ship getSelectedShip() {
+        return selectedShip;
+    }
+
+    public void clearSelectedShip() {
+        selectedShip = null;
+    }
+
+    public void incrementShipPlaced(int shipType) {
+        if (shipType >= 0 && shipType < shipsPlaced.length) {
+            shipsPlaced[shipType]++;
         }
     }
 }

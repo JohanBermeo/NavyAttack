@@ -86,10 +86,10 @@ public class BoardView {
         controlPanel.setStyle("-fx-background-color: #5872C9; -fx-padding: 20px;");
 
         // Crear cada sección de barco con más espacio para imágenes
-        VBox carrySection = createShipSection("Añadir Portaaviones", "Portaviones.png", 0);
-        VBox cruiserSection = createShipSection("Añadir Crucero", "Cruceros.png", 1);
-        VBox destroyerSection = createShipSection("Añadir Destructor", "Destructores.png", 2);
-        VBox submarineSection = createShipSection("Añadir Submarino", "Submarino.png", 3);
+        VBox carrySection = createShipSection("Añadir Portaaviones", "portaviones.png", 0);
+        VBox cruiserSection = createShipSection("Añadir Crucero", "crucero.png", 1);
+        VBox destroyerSection = createShipSection("Añadir Destructor", "destructor.png", 2);
+        VBox submarineSection = createShipSection("Añadir Submarino", "submarino.png", 3);
 
         // Botones de acción
         HBox actionButtons = createActionButtons();
@@ -173,7 +173,7 @@ public class BoardView {
     }
 
     private ImageView createShipImage(String imagePath, double width, double height) {
-        System.out.println("=== Creando imagen: " + imagePath + " ===");
+        System.out.println("Creando imagen: " + imagePath);
 
         // Primero intentar cargar la imagen
         Image image = loadImageFromResources(imagePath);
@@ -183,7 +183,7 @@ public class BoardView {
             ImageView imageView = new ImageView(image);
             imageView.setFitWidth(width);
             imageView.setFitHeight(height);
-            imageView.setSmooth(true);
+            imageView.setSmooth(false);
             return imageView;
         } else {
             System.out.println("Creando placeholder para: " + imagePath);
@@ -208,13 +208,13 @@ public class BoardView {
                 if (stream != null) {
                     Image img = new Image(stream);
                     if (!img.isError() && img.getHeight() > 0) {
-                        System.out.println("✓ Éxito: " + path);
+                        System.out.println("Exito: " + path);
                         return img;
                     }
                     stream.close();
                 }
             } catch (Exception e) {
-                System.out.println("✗ Error en " + path + ": " + e.getMessage());
+                System.out.println("Error en " + path + ": " + e.getMessage());
             }
         }
         return null;
@@ -260,10 +260,10 @@ public class BoardView {
         actionBox.setSpacing(20);
         actionBox.setPadding(new Insets(20, 0, 0, 0));
 
-        btnRotateShip = new Button("Rotar [R]");
+        btnRotateShip = new Button("Rotar");
         btnRotateShip.setStyle(getActionButtonStyle());
 
-        btnPlaceShip = new Button("Posicionar [Enter]");
+        btnPlaceShip = new Button("Posicionar");
         btnPlaceShip.setStyle(getActionButtonStyle());
 
         actionBox.getChildren().addAll(btnRotateShip, btnPlaceShip);
@@ -334,26 +334,26 @@ public class BoardView {
 
     // Método para debug - puedes llamarlo desde el constructor temporalmente
     public void debugImagePaths() {
-        System.out.println("=== DEBUG DE RUTAS DE IMÁGENES ===");
-        String[] imageNames = {"Portaviones.png", "Cruceros.png", "Destructores.png", "Submarino.png"};
+        System.out.println("DEBUG DE RUTAS DE IMÁGENES");
+        String[] imageNames = {"portaviones.png", "crucero.png", "destructor.png", "submarino.png"};
 
         for (String imageName : imageNames) {
             System.out.println("Verificando: " + imageName);
             var url = getClass().getResource("/images/sprites/" + imageName);
             if (url != null) {
-                System.out.println("  ✓ Encontrado en: " + url);
+                System.out.println("Encontrado en: " + url);
             } else {
-                System.out.println("  ✗ NO encontrado en /images/sprites/");
+                System.out.println("No encontrado en /images/sprites/");
                 // Intentar otras rutas
                 url = getClass().getResource("/" + imageName);
                 if (url != null) {
-                    System.out.println("  ✓ Encontrado en root: " + url);
+                    System.out.println("Encontrado en root: " + url);
                 } else {
-                    System.out.println("  ✗ NO encontrado en ninguna ubicación");
+                    System.out.println("No encontrado en ninguna ubicación");
                 }
             }
         }
-        System.out.println("=== FIN DEBUG ===");
+        System.out.println("FIN DEBUG");
     }
 
     // Métodos públicos para la funcionalidad
@@ -365,17 +365,30 @@ public class BoardView {
         }
     }
 
-    public void highlightCell(int row, int col) {
-        // Resetear todas las celdas
+    /**
+     * Limpia el resaltado de todas las celdas del tablero.
+     */
+    public void clearHighlights() {
         for (int r = 0; r < 10; r++) {
             for (int c = 0; c < 10; c++) {
-                if (boardCells[r][c].getStyle().contains("yellow")) {
-                    boardCells[r][c].setStyle("-fx-background-color: white; -fx-border-color: #000000; -fx-border-width: 1px;");
-                }
+                boardCells[r][c].setStyle("-fx-background-color: white; -fx-border-color: #000000; -fx-border-width: 1px;");
             }
         }
-        // Resaltar celda seleccionada
+    }
+
+    public void highlightCell(int row, int col) {
+        clearHighlights();
         boardCells[row][col].setStyle("-fx-background-color: #ffeb3b; -fx-border-color: #333; -fx-border-width: 2px;");
+    }
+
+    /**
+     * Resalta una lista de celdas en el tablero.
+     */
+    public void highlightCells(java.util.List<int[]> positions) {
+        clearHighlights();
+        for (int[] pos : positions) {
+            boardCells[pos[0]][pos[1]].setStyle("-fx-background-color: #ffeb3b; -fx-border-color: #333; -fx-border-width: 2px;");
+        }
     }
 
     public void showShipOnBoard(int row, int col, int length, com.navyattack.model.Orientation orientation) {

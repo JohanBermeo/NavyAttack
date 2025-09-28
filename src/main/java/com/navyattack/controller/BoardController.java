@@ -14,10 +14,6 @@ public class BoardController {
     private int selectedRow = -1;
     private int selectedCol = -1;
 
-    // Contadores de barcos disponibles
-    private int[] shipCounts = {1, 2, 3, 4}; // Portaaviones, Crucero, Destructor, Submarino
-    private int[] shipsPlaced = {0, 0, 0, 0}; // Barcos colocados por tipo
-
     public BoardController(Board model, BoardView view) {
         this.model = model;
         this.view = view;
@@ -36,16 +32,16 @@ public class BoardController {
     }
 
     private void initializeShipCounts() {
-        // Mostrar contadores iniciales
+        int[] shipCounts = model.getShipCounts();
+        int[] shipsPlaced = model.getShipsPlaced();
         for (int i = 0; i < shipCounts.length; i++) {
             view.updateShipCount(i, shipCounts[i] - shipsPlaced[i]);
         }
     }
 
     private void onDeployCarry(ActionEvent e) {
-        if (canDeployShip(0)) {
-            selectedShip = new Ship(0, 0, 6, currentOrientation, false, null, 0, false);
-            selectedShip.setDeployable(true);
+        selectedShip = model.deployCarrier();
+        if (selectedShip != null) {
             System.out.println("Portaaviones seleccionado para despliegue");
         } else {
             System.out.println("No hay más portaaviones disponibles");
@@ -53,9 +49,8 @@ public class BoardController {
     }
 
     private void onDeployCruiser(ActionEvent e) {
-        if (canDeployShip(1)) {
-            selectedShip = new Ship(0, 0, 4, currentOrientation, false, null, 0, false);
-            selectedShip.setDeployable(true);
+        selectedShip = model.deployCruiser();
+        if (selectedShip != null) {
             System.out.println("Crucero seleccionado para despliegue");
         } else {
             System.out.println("No hay más cruceros disponibles");
@@ -63,9 +58,8 @@ public class BoardController {
     }
 
     private void onDeployDestroyer(ActionEvent e) {
-        if (canDeployShip(2)) {
-            selectedShip = new Ship(0, 0, 3, currentOrientation, false, null, 0, false);
-            selectedShip.setDeployable(true);
+        selectedShip = model.deployDestroyer();
+        if (selectedShip != null) {
             System.out.println("Destructor seleccionado para despliegue");
         } else {
             System.out.println("No hay más destructores disponibles");
@@ -73,22 +67,17 @@ public class BoardController {
     }
 
     private void onDeploySubmarine(ActionEvent e) {
-        if (canDeployShip(3)) {
-            selectedShip = new Ship(0, 0, 2, currentOrientation, false, null, 0, false);
-            selectedShip.setDeployable(true);
+        selectedShip = model.deploySubmarine();
+        if (selectedShip != null) {
             System.out.println("Submarino seleccionado para despliegue");
         } else {
             System.out.println("No hay más submarinos disponibles");
         }
     }
 
-    private boolean canDeployShip(int shipType) {
-        return (shipCounts[shipType] - shipsPlaced[shipType]) > 0;
-    }
-
     private int getShipTypeByLength(int length) {
         return switch (length) {
-            case 5 -> 0; // Portaaviones
+            case 6 -> 0; // Portaaviones
             case 4 -> 1; // Crucero
             case 3 -> 2; // Destructor
             case 2 -> 3; // Submarino
@@ -105,7 +94,19 @@ public class BoardController {
 
             // Actualizar vista previa si hay una posición seleccionada
             if (selectedRow != -1 && selectedCol != -1) {
-                showShipPreview();
+                // Calcular nuevas posiciones y resaltar en el tablero
+                java.util.List<int[]> positions = new java.util.ArrayList<>();
+                int length = selectedShip.getLength();
+                if (currentOrientation == Orientation.HORIZONTAL) {
+                    for (int c = selectedCol; c < selectedCol + length && c < 10; c++) {
+                        positions.add(new int[]{selectedRow, c});
+                    }
+                } else {
+                    for (int r = selectedRow; r < selectedRow + length && r < 10; r++) {
+                        positions.add(new int[]{r, selectedCol});
+                    }
+                }
+                view.highlightCells(positions);
             }
         } else {
             System.out.println("No hay barco seleccionado para rotar");
@@ -124,7 +125,9 @@ public class BoardController {
                     // Actualizar contadores
                     int shipType = getShipTypeByLength(selectedShip.getLength());
                     if (shipType != -1) {
-                        shipsPlaced[shipType]++;
+                        model.incrementShipPlaced(shipType);
+                        int[] shipCounts = model.getShipCounts();
+                        int[] shipsPlaced = model.getShipsPlaced();
                         view.updateShipCount(shipType, shipCounts[shipType] - shipsPlaced[shipType]);
                     }
 
@@ -138,18 +141,16 @@ public class BoardController {
                     selectedRow = -1;
                     selectedCol = -1;
                 } else {
-                    System.out.println("No se puede colocar el barco en esa posición");
-                    showInvalidPlacement();
+                    System.out.println("No se puede colocar el barco en esa posicion");
                 }
             } catch (Exception ex) {
                 System.err.println("Error al colocar barco: " + ex.getMessage());
-                showInvalidPlacement();
             }
         } else {
             if (selectedShip == null) {
                 System.out.println("No hay barco seleccionado");
             } else {
-                System.out.println("No hay posición seleccionada");
+                System.out.println("No hay posicion seleccionada");
             }
         }
     }
@@ -162,13 +163,22 @@ public class BoardController {
                 selectedRow = pos[0];
                 selectedCol = pos[1];
                 System.out.println("Celda seleccionada: (" + selectedRow + ", " + selectedCol + ")");
-
-                // Resaltar la celda seleccionada
-                view.highlightCell(selectedRow, selectedCol);
-
-                // Mostrar vista previa del barco si hay uno seleccionado
+                // Calcular posiciones del barco si hay uno seleccionado
                 if (selectedShip != null) {
-                    showShipPreview();
+                    java.util.List<int[]> positions = new java.util.ArrayList<>();
+                    int length = selectedShip.getLength();
+                    if (currentOrientation == Orientation.HORIZONTAL) {
+                        for (int c = selectedCol; c < selectedCol + length && c < 10; c++) {
+                            positions.add(new int[]{selectedRow, c});
+                        }
+                    } else {
+                        for (int r = selectedRow; r < selectedRow + length && r < 10; r++) {
+                            positions.add(new int[]{r, selectedCol});
+                        }
+                    }
+                    view.highlightCells(positions);
+                } else {
+                    view.highlightCell(selectedRow, selectedCol);
                 }
             }
         }
@@ -178,18 +188,15 @@ public class BoardController {
         // Aquí podrías implementar una vista previa del barco
         // Por ahora solo validamos si se puede colocar
         if (model.canPlaceShipAt(selectedRow, selectedCol, selectedShip.getLength(), currentOrientation)) {
-            System.out.println("Posición válida para el barco");
+            System.out.println("Posicion valida para el barco");
         } else {
-            System.out.println("Posición inválida para el barco");
+            System.out.println("Posicion invalida para el barco");
         }
     }
 
-    private void showInvalidPlacement() {
-        // Podríías agregar un efecto visual para mostrar posición inválida
-        System.out.println("Posición inválida - el barco no cabe o se superpone con otro");
-    }
-
     private void checkGameReady() {
+        int[] shipCounts = model.getShipCounts();
+        int[] shipsPlaced = model.getShipsPlaced();
         boolean allShipsPlaced = true;
         for (int i = 0; i < shipCounts.length; i++) {
             if (shipsPlaced[i] < shipCounts[i]) {
@@ -199,7 +206,7 @@ public class BoardController {
         }
 
         if (allShipsPlaced) {
-            System.out.println("¡Todos los barcos han sido colocados! El juego está listo.");
+            System.out.println("Todos los barcos han sido colocados. El juego esta listo.");
             // Aquí podrías habilitar el botón de "Iniciar Batalla" o similar
         } else {
             int totalRemaining = 0;
@@ -219,15 +226,9 @@ public class BoardController {
         return view;
     }
 
-    public int[] getShipCounts() {
-        return shipCounts.clone();
-    }
-
-    public int[] getShipsPlaced() {
-        return shipsPlaced.clone();
-    }
-
     public boolean isGameReady() {
+        int[] shipCounts = model.getShipCounts();
+        int[] shipsPlaced = model.getShipsPlaced();
         for (int i = 0; i < shipCounts.length; i++) {
             if (shipsPlaced[i] < shipCounts[i]) {
                 return false;
