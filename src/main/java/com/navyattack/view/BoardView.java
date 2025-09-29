@@ -86,10 +86,10 @@ public class BoardView {
         controlPanel.setStyle("-fx-background-color: #5872C9; -fx-padding: 20px;");
 
         // Crear cada sección de barco con más espacio para imágenes
-        VBox carrySection = createShipSection("Añadir Portaaviones", "portaviones.png", 0);
-        VBox cruiserSection = createShipSection("Añadir Crucero", "crucero.png", 1);
-        VBox destroyerSection = createShipSection("Añadir Destructor", "destructor.png", 2);
-        VBox submarineSection = createShipSection("Añadir Submarino", "submarino.png", 3);
+        HBox carrySection = createShipSection("Añadir Portaaviones", "portaviones.png", 0);
+        HBox cruiserSection = createShipSection("Añadir Crucero", "crucero.png", 1);
+        HBox destroyerSection = createShipSection("Añadir Destructor", "destructor.png", 2);
+        HBox submarineSection = createShipSection("Añadir Submarino", "submarino.png", 3);
 
         // Botones de acción
         HBox actionButtons = createActionButtons();
@@ -105,55 +105,21 @@ public class BoardView {
         return controlPanel;
     }
 
-    private VBox createShipSection(String buttonText, String imagePath, int shipIndex) {
-        VBox section = new VBox();
-        section.setAlignment(Pos.CENTER);
-        section.setSpacing(8);
+    private HBox createShipSection(String buttonText, String imagePath, int shipIndex) {
+        HBox section = new HBox();
+        section.setAlignment(Pos.CENTER_LEFT);
+        section.setSpacing(20); // Espaciado más amplio para mejor alineación
 
-        // Configurar dimensiones específicas para cada tipo de barco
-        double width, height;
-        switch(shipIndex) {
-            case 0: // Portaaviones
-                width = 245;
-                height = 92;
-                break;
-            case 1: // Cruceros
-                width = 169;
-                height = 53;
-                break;
-            case 2: // Destructores
-                width = 112;
-                height = 40;
-                break;
-            case 3: // Submarinos
-                width = 56;
-                height = 33;
-                break;
-            default:
-                width = 100;
-                height = 50;
-        }
-
-        // Contenedor para la imagen con altura específica
-        VBox imageContainer = new VBox();
-        imageContainer.setAlignment(Pos.CENTER);
-        imageContainer.setPrefHeight(height);
-        imageContainer.setMaxHeight(height);
+        // Tamaño estándar para todas las imágenes de barcos
+        double width = 120;
+        double height = 48;
 
         // Imagen del barco
         ImageView shipImage = createShipImage(imagePath, width, height);
-        imageContainer.getChildren().add(shipImage);
-
-        // Contenedor horizontal para botón y contador
-        HBox buttonRow = new HBox();
-        buttonRow.setAlignment(Pos.CENTER);
-        buttonRow.setSpacing(15);
 
         // Botón
         Button shipButton = new Button(buttonText);
         shipButton.setStyle(getShipButtonStyle());
-
-        // Asignar referencia según el tipo
         switch (shipIndex) {
             case 0 -> btnDeployCarry = shipButton;
             case 1 -> btnDeployCruiser = shipButton;
@@ -161,14 +127,16 @@ public class BoardView {
             case 3 -> btnDeploySubmarine = shipButton;
         }
 
-        // Contador (círculo con número)
+        // Contador
         Label countLabel = new Label("1");
         countLabel.setStyle(getCountLabelStyle());
         shipCountLabels[shipIndex] = countLabel;
 
-        buttonRow.getChildren().addAll(shipButton, countLabel);
-        section.getChildren().addAll(imageContainer, buttonRow);
+        VBox buttonAndCount = new VBox(shipButton, countLabel);
+        buttonAndCount.setAlignment(Pos.CENTER);
+        buttonAndCount.setSpacing(5);
 
+        section.getChildren().addAll(shipImage, buttonAndCount);
         return section;
     }
 
@@ -366,12 +334,21 @@ public class BoardView {
     }
 
     /**
-     * Limpia el resaltado de todas las celdas del tablero.
+     * Limpia el resaltado amarillo de las celdas, pero no borra el estilo de los barcos ya posicionados.
      */
     public void clearHighlights() {
         for (int r = 0; r < 10; r++) {
             for (int c = 0; c < 10; c++) {
-                boardCells[r][c].setStyle("-fx-background-color: white; -fx-border-color: #000000; -fx-border-width: 1px;");
+                String style = boardCells[r][c].getStyle();
+                // Si la celda está resaltada en amarillo, pero no tiene el color de barco fijo
+                if (style.contains("#ffeb3b")) {
+                    // Si la celda también tiene el color de barco fijo, lo dejamos
+                    if (style.contains("#666")) {
+                        boardCells[r][c].setStyle("-fx-background-color: #666; -fx-border-color: #333; -fx-border-width: 2px;");
+                    } else {
+                        boardCells[r][c].setStyle("-fx-background-color: white; -fx-border-color: #000000; -fx-border-width: 1px;");
+                    }
+                }
             }
         }
     }
