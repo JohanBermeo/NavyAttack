@@ -10,7 +10,7 @@ import javafx.stage.Stage;
  * Main class - Punto de entrada de NavyAttack
  * Inicializa JavaFX y muestra el menú principal
  */
-public class Main extends Application {
+public class MainBoard extends Application {
 
     @Override
     public void start(Stage primaryStage) {
