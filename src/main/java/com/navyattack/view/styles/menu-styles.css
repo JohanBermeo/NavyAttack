@@ -1,0 +1,117 @@
+/* ===================================
+   MENU PRINCIPAL - ESTILOS EXTERNOS
+   =================================== */
+
+/* Fondo principal del menú */
+.main-menu-background {
+     -fx-background-color: #5872C9;
+}
+
+/* Título principal */
+.menu-title {
+    -fx-font-family: "Arial Black", Arial, sans-serif;
+    -fx-font-size: 36px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.7), 5, 0, 3, 3);
+}
+
+/* Subtítulo */
+.menu-subtitle {
+    -fx-font-family: "Arial", sans-serif;
+    -fx-font-size: 16px;
+    -fx-text-fill: #e8e8e8;
+}
+
+/* Botones primarios del menú */
+.menu-button-primary {
+    -fx-background-color: linear-gradient(to bottom, #4a90e2, #357abd);
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 5, 0, 2, 2);
+    -fx-pref-width: 280px;
+    -fx-pref-height: 50px;
+}
+
+.menu-button-primary:hover {
+    -fx-background-color: linear-gradient(to bottom, #5ba0f2, #4a90e2);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.menu-button-primary:pressed {
+    -fx-background-color: linear-gradient(to bottom, #357abd, #2868a0);
+    -fx-translate-y: 1px;
+}
+
+/* Botón de salir (peligroso) */
+.menu-button-danger {
+    -fx-background-color: linear-gradient(to bottom, #e74c3c, #c0392b);
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 5, 0, 2, 2);
+    -fx-pref-width: 280px;
+    -fx-pref-height: 50px;
+}
+
+.menu-button-danger:hover {
+    -fx-background-color: linear-gradient(to bottom, #f75c4c, #e74c3c);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.menu-button-danger:pressed {
+    -fx-background-color: linear-gradient(to bottom, #c0392b, #a93226);
+    -fx-translate-y: 1px;
+}
+
+/* ===================================
+   FONDOS ALTERNATIVOS
+   =================================== */
+
+/* Tema oscuro moderno */
+.menu-background-dark {
+    -fx-background-color: linear-gradient(135deg, #232526 0%, #414345 100%);
+}
+
+/* Tema océano */
+.menu-background-ocean {
+    -fx-background-color: linear-gradient(to bottom, #74b9ff, #0984e3, #2d3436);
+}
+
+/* Tema militar */
+.menu-background-military {
+    -fx-background-color: linear-gradient(45deg, #2d3436 0%, #636e72 50%, #2d3436 100%);
+}
+
+/* Tema atardecer naval */
+.menu-background-sunset {
+    -fx-background-color: linear-gradient(to bottom, #fd79a8, #e84393, #2d3436);
+}
+
+/* ===================================
+   ANIMACIONES
+   =================================== */
+
+.menu-button-primary,
+.menu-button-danger {
+    -fx-transition: all 0.3s ease;
+}
+
+/* Efecto de pulsación para el título */
+.menu-title {
+    -fx-animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { -fx-scale-x: 1; -fx-scale-y: 1; }
+    50% { -fx-scale-x: 1.02; -fx-scale-y: 1.02; }
+}
