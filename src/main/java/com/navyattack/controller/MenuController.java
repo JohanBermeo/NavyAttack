@@ -9,9 +9,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import java.util.List;
-import java.util.ArrayList;
 
 import com.navyattack.model.User;
+import com.navyattack.view.PlayView;
 import com.navyattack.view.MenuView;
 import com.navyattack.view.LoginView;
 import com.navyattack.view.SignUpView;
@@ -23,6 +23,7 @@ import com.navyattack.model.Authentication;
 public class MenuController {
     
     private MenuView menuView;
+    private PlayView playView;
     private LoginView loginView;
     private SignUpView signUpView;
     private HistoryView historyView;
@@ -100,6 +101,7 @@ public class MenuController {
         this.signUpView = null;
         this.historyView = null;
         this.menuView = null;
+    	this.playView = null;
     }
     
     // Método para inicializar la vista y pasarle la referencia del controlador
@@ -155,6 +157,8 @@ public class MenuController {
             currentStage = (Stage) signUpView.getScene().getWindow();
 	    } else if (historyView != null && historyView.getScene() != null) {
 	        currentStage = (Stage) historyView.getScene().getWindow();
+        } else if (playView != null && playView.getScene() != null) {
+	        currentStage = (Stage) playView.getScene().getWindow();
         } else if (menuView != null && menuView.getScene() != null) {
             currentStage = (Stage) menuView.getScene().getWindow();
         } else {
@@ -195,6 +199,13 @@ public class MenuController {
         historyView.start(currentStage);
     }
     
+    public void navigateToPlay() {
+        Stage currentStage = (Stage) menuView.getScene().getWindow();
+        clearViewReferences();
+        this.playView = new PlayView(this);
+        playView.start(currentStage);
+    }
+
     public void navigateToLogin() {
         Stage currentStage = null;
         

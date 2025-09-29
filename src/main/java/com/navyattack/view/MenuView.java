@@ -113,7 +113,10 @@ public class MenuView extends Application {
         Button playBtn = new Button("Play"); 
         playBtn.setMaxWidth(125); 
         UtilsMenuView.styleButton(playBtn, "black", "#333333", "white", "10px 0 10px 0"); 
-        GridPane.setHalignment(playBtn, HPos.CENTER); 
+        playBtn.setOnAction(e -> { 
+            controller.navigateToPlay();
+        }); 
+	    GridPane.setHalignment(playBtn, HPos.CENTER); 
         grid.add(playBtn, 0, 2, 1, 1); 
 
         Button historyBtn = new Button("History"); 
@@ -182,6 +185,9 @@ public class MenuView extends Application {
 
         Button playBtn = new Button("PLAY"); 
         playBtn.setMaxWidth(125); 
+	    playBtn.setOnAction(e -> { 
+            controller.navigateToPlay();
+        }); 
         UtilsMenuView.styleButton(playBtn, "black", "#333333", "white", "10px 0 10px 0"); 
         GridPane.setHalignment(playBtn, HPos.CENTER); 
         grid.add(playBtn, 0, 2, 1, 1); 
