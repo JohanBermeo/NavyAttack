@@ -61,15 +61,10 @@ public class MenuView extends Application {
         leftContainer.setAlignment(Pos.CENTER_LEFT); 
         leftContainer.getChildren().addAll(imageUser, leftText); 
 
-<<<<<<< Updated upstream
-        ImageView imageAdd = UtilsMenuView.createImage("file:docs/Icons/png/001-botn-agregar.png"); 
-	imageAdd.setStyle("-fx-cursor: hand;");
-	imageAdd.setOnMouseClicked(event -> {
-=======
+
         ImageView imageAdd = UtilsMenuView.createImage("file:docs/Icons/png/001-botn-agregar.png");
         imageAdd.setStyle("-fx-cursor: hand;");
         imageAdd.setOnMouseClicked(event -> {
->>>>>>> Stashed changes
             controller.navigateToSecondUserLogin();
         });
 
