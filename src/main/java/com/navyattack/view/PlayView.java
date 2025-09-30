@@ -21,10 +21,10 @@ import com.navyattack.controller.MenuController;
 public class PlayView extends Application {
     
     private Scene scene;
-    private MenuController controller;
+    private MenuController menuController;
     
-    public PlayView(MenuController controller) {
-        this.controller = controller;
+    public PlayView(MenuController menuController) {
+        this.menuController = menuController;
     }
     
     @Override
@@ -46,7 +46,7 @@ public class PlayView extends Application {
             "Player vs CPU",
             "🤖",
             () -> {
-                System.out.println("Iniciando modo Player vs CPU");
+                menuController.navigateToDeployment("PVC");
             }
         );
         cardPlayerVsCPU.setStyle(
@@ -69,12 +69,14 @@ public class PlayView extends Application {
         });  
 
         StackPane cardPlayerVsPlayer;
-        
-        if (controller.hasSingleUser()) {
+
+        if (menuController.hasSingleUser()) {
             cardPlayerVsPlayer = createCard(
                 "Player vs Player",
                 "👥",
-                () -> {}
+                () -> {
+                    menuController.navigateToDeployment("PVP");
+                }
             );
             cardPlayerVsPlayer.setStyle(
                 "-fx-background-color: #808080;" +
@@ -172,7 +174,7 @@ public class PlayView extends Application {
         backButton.setPrefWidth(150); 
         UtilsMenuView.styleButton(backButton, "black", "#333333", "white", "5px 0 5px 0");
         backButton.setOnAction(e -> {
-            controller.navigateToGameMenu();
+            menuController.navigateToGameMenu();
         }); 
 
         bottomPanel.getChildren().add(backButton); 
