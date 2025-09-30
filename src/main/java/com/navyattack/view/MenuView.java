@@ -62,6 +62,10 @@ public class MenuView extends Application {
         leftContainer.getChildren().addAll(imageUser, leftText); 
 
         ImageView imageAdd = UtilsMenuView.createImage("file:docs/Icons/png/001-botn-agregar.png"); 
+	imageAdd.setStyle("-fx-cursor: hand;");
+	imageAdd.setOnMouseClicked(event -> {
+            controller.navigateToSecondUserLogin();
+        });
 
         Text rightText = new Text("Add new user"); 
 	    rightText.setStyle("-fx-fill: white;");
