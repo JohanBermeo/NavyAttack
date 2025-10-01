@@ -68,14 +68,35 @@ public class BoardGridComponent {
         return gridPane;
     }
 
+    /**
+     * Establece el handler para clicks en las celdas.
+     *
+     * @param handler EventHandler que se ejecutará al hacer click en una celda
+     */
     public void setCellClickHandler(EventHandler<ActionEvent> handler) {
-        if (!interactive) return;
+        if (!interactive) {
+            System.out.println("WARNING: Trying to set click handler on non-interactive board");
+            return;
+        }
+
+        System.out.println("Setting cell click handler on " + size + "x" + size + " board");
 
         for (int row = 0; row < size; row++) {
             for (int col = 0; col < size; col++) {
-                cells[row][col].setOnAction(handler);
+                Button cell = cells[row][col];
+
+                // Verificar que la celda tenga userData
+                if (cell.getUserData() == null) {
+                    System.err.println("WARNING: Cell [" + row + "," + col + "] has no userData");
+                    cell.setUserData(new int[]{row, col});
+                }
+
+                // Establecer el handler
+                cell.setOnAction(handler);
             }
         }
+
+        System.out.println("Cell click handler set successfully");
     }
 
     public void highlightCells(java.util.List<int[]> positions, String color) {
@@ -143,6 +164,26 @@ public class BoardGridComponent {
                 cells[row][col].setDisable(false);
             }
         }
+    }
+
+    /**
+     * Resetea todas las celdas a su estado inicial.
+     */
+    public void reset() {
+        for (int row = 0; row < size; row++) {
+            for (int col = 0; col < size; col++) {
+                cells[row][col].setText("");
+                cells[row][col].setStyle(getCellStyle());
+            }
+        }
+    }
+
+    /**
+     * Limpia completamente el tablero (usado en swap de displays).
+     */
+    public void clearAll() {
+        reset();
+        clearHighlights();
     }
 
     private boolean isValidPosition(int row, int col) {

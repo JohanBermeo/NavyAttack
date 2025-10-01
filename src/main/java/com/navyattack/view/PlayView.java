@@ -70,52 +70,69 @@ public class PlayView extends Application {
 
         StackPane cardPlayerVsPlayer;
 
-        if (menuController.hasSingleUser()) {
+        if (!menuController.hasSingleUser()) {
+            // Caso: HAY DOS USUARIOS - Habilitar PVP
             cardPlayerVsPlayer = createCard(
-                "Player vs Player",
-                "👥",
-                () -> {
-                    menuController.navigateToDeployment("PVP");
-                }
+                    "Player vs Player",
+                    "👥",
+                    () -> {
+                        System.out.println("Iniciando modo Player vs Player");
+                        menuController.navigateToDeployment("PVP");
+                    }
             );
+
+            // Estilo activo con gradiente de dos colores
             cardPlayerVsPlayer.setStyle(
-                "-fx-background-color: #808080;" +
-                "-fx-border-color: #FFFFFF;" +
-                "-fx-background-radius: 10;" +
-                "-fx-border-width: 2;" +
-                "-fx-border-radius: 10;" +
-                "-fx-opacity: 0.5;"
+                    "-fx-background-color: linear-gradient(to right, #5872C9 0%, #5872C9 50%, #C95858 50%, #C95858 100%);" +
+                            "-fx-border-color: #FFFFFF;" +
+                            "-fx-background-radius: 10;" +
+                            "-fx-border-width: 2;" +
+                            "-fx-border-radius: 10;"
             );
-            cardPlayerVsPlayer.setCursor(Cursor.DEFAULT);
-            cardPlayerVsPlayer.setOnMouseEntered(null);
-            cardPlayerVsPlayer.setOnMouseExited(null);
-            cardPlayerVsPlayer.setOnMouseClicked(null);
-        } else {
-            cardPlayerVsPlayer = createCard(
-                "Player vs Player",
-                "👥",
-                () -> {
-                    System.out.println("Iniciando modo Player vs Player");
-                }
-            );
-            cardPlayerVsPlayer.setStyle(
-                "-fx-background-color: linear-gradient(to right, #5872C9 0%, #5872C9 50%, #C95858 50%, #C95858 100%);" +
-                "-fx-border-color: #FFFFFF;" +
-                "-fx-background-radius: 10;" +
-                "-fx-border-width: 2;" +
-                "-fx-border-radius: 10;"
-            );
+
+            // Efectos hover
+            cardPlayerVsPlayer.setOnMouseEntered(e -> {
+                cardPlayerVsPlayer.setScaleX(1.05);
+                cardPlayerVsPlayer.setScaleY(1.05);
+            });
+
             cardPlayerVsPlayer.setOnMouseExited(e -> {
                 cardPlayerVsPlayer.setStyle(
-                    "-fx-background-color: linear-gradient(to right, #5872C9 0%, #5872C9 50%, #C95858 50%, #C95858 100%);" +
-                    "-fx-border-color: #FFFFFF;" +
-                    "-fx-background-radius: 10;" +
-                    "-fx-border-width: 2;" +
-                    "-fx-border-radius: 10;"
+                        "-fx-background-color: linear-gradient(to right, #5872C9 0%, #5872C9 50%, #C95858 50%, #C95858 100%);" +
+                                "-fx-border-color: #FFFFFF;" +
+                                "-fx-background-radius: 10;" +
+                                "-fx-border-width: 2;" +
+                                "-fx-border-radius: 10;"
                 );
                 cardPlayerVsPlayer.setScaleX(1.0);
                 cardPlayerVsPlayer.setScaleY(1.0);
             });
+
+        } else {
+            // Caso: SOLO UN USUARIO - Deshabilitar PVP
+            cardPlayerVsPlayer = createCard(
+                    "Player vs Player",
+                    "👥",
+                    () -> {
+                        // No hacer nada (card deshabilitada)
+                    }
+            );
+
+            // Estilo deshabilitado (gris y semi-transparente)
+            cardPlayerVsPlayer.setStyle(
+                    "-fx-background-color: #808080;" +
+                            "-fx-border-color: #FFFFFF;" +
+                            "-fx-background-radius: 10;" +
+                            "-fx-border-width: 2;" +
+                            "-fx-border-radius: 10;" +
+                            "-fx-opacity: 0.5;"
+            );
+
+            // Deshabilitar interacciones
+            cardPlayerVsPlayer.setCursor(Cursor.DEFAULT);
+            cardPlayerVsPlayer.setOnMouseEntered(null);
+            cardPlayerVsPlayer.setOnMouseExited(null);
+            cardPlayerVsPlayer.setOnMouseClicked(null);
         }
         
         cardsContainer.getChildren().addAll(cardPlayerVsCPU, cardPlayerVsPlayer);       
