@@ -18,6 +18,7 @@ public class DeploymentController {
     private final DeploymentView view;
     private final DeploymentState deploymentState;
     private final MenuController menuController;
+    private static Board player1Board = null;
 
     public DeploymentController(Board board, DeploymentView view, MenuController menuController) {
         this.board = board;
@@ -132,9 +133,27 @@ public class DeploymentController {
     }
 
     private void handleStartGame() {
-        // Aquí pasamos al GameView
         String gameMode = view.getGameMode();
-        menuController.navigateToGame(board, gameMode);
+
+        if (gameMode.equals("PVP")) {
+            // Modo Player vs Player
+            if (player1Board == null) {
+                // Este es el primer jugador
+                player1Board = board;
+                System.out.println("Player 1 deployment complete. Transitioning to Player 2...");
+                menuController.navigateToTransition(gameMode);
+            } else {
+                // Este es el segundo jugador
+                Board player2Board = board;
+                System.out.println("Player 2 deployment complete. Starting battle...");
+                menuController.navigateToGame(player1Board, player2Board, gameMode);
+                // Resetear para la próxima partida
+                player1Board = null;
+            }
+        } else {
+            // Modo Player vs CPU
+            menuController.navigateToGame(board, null, gameMode);
+        }
     }
 
     private boolean isDeploymentComplete() {

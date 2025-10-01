@@ -11,12 +11,17 @@ import java.util.List;
 
 import com.navyattack.model.User;
 import com.navyattack.model.Board;
+import com.navyattack.model.Ship;
+import com.navyattack.model.ShipType;
 import com.navyattack.view.PlayView;
 import com.navyattack.view.MenuView;
 import com.navyattack.view.LoginView;
 import com.navyattack.view.SignUpView;
 import com.navyattack.view.HistoryView;
 import com.navyattack.view.DeploymentView;
+import com.navyattack.view.TransitionView;
+import com.navyattack.view.GameView;
+import com.navyattack.view.VictoryView;
 import com.navyattack.model.DataManager;
 import com.navyattack.model.Authentication;
 
@@ -29,6 +34,9 @@ public class MenuController {
     private HistoryView historyView;
     private DeploymentView deploymentView;
     private DataManager dataManager;
+    private TransitionView transitionView;
+    private GameView gameView;
+    private VictoryView victoryView;
 
     private static final String DATA_DIR = "data";
     private static final String USERS_FILE = "users.dat";
@@ -105,6 +113,9 @@ public class MenuController {
         this.menuView = null;
         this.playView = null;
         this.deploymentView = null;
+        this.transitionView = null;
+        this.gameView = null;
+        this.victoryView = null;
     }
 
     // ==================== MÉTODOS DE INICIALIZACIÓN ====================
@@ -153,6 +164,16 @@ public class MenuController {
         return false;
     }
 
+    public void logoutUser(User user) {
+        dataManager.deleteLoggedUser(user);
+
+        if (dataManager.isLoggedEmpty()) {
+            navigateToLogin();
+        } else {
+            navigateToGameMenu();
+        }
+    }
+
     // ==================== MÉTODOS DE NAVEGACIÓN ====================
 
     public void navigateToGameMenu() {
@@ -171,6 +192,10 @@ public class MenuController {
             currentStage = (Stage) menuView.getScene().getWindow();
         } else if (deploymentView != null && deploymentView.getScene() != null) {
             currentStage = (Stage) deploymentView.getScene().getWindow();
+        } else if (gameView != null && gameView.getScene() != null) {
+            currentStage = (Stage) gameView.getScene().getWindow();
+        } else if (victoryView != null && victoryView.getScene() != null) {  // ← AGREGAR
+            currentStage = (Stage) victoryView.getScene().getWindow();
         } else {
             System.err.println("ERROR: No se pudo obtener el Stage actual");
             return;
@@ -183,6 +208,7 @@ public class MenuController {
         this.menuView = new MenuView(this, dataManager.getLoggedUsers());
         menuView.start(currentStage);
     }
+
 
     public void navigateToSecondUserLogin() {
         Stage currentStage;
@@ -227,11 +253,14 @@ public class MenuController {
     }
 
     public void navigateToPlay() {
-        Stage currentStage;
+        Stage currentStage = null;
+
         if (menuView != null && menuView.getScene() != null) {
             currentStage = (Stage) menuView.getScene().getWindow();
+        } else if (victoryView != null && victoryView.getScene() != null) {  // ← AGREGAR
+            currentStage = (Stage) victoryView.getScene().getWindow();
         } else {
-            System.err.println("ERROR: menuView is null");
+            System.err.println("ERROR: No se pudo obtener el Stage para navigateToPlay");
             return;
         }
 
@@ -263,7 +292,6 @@ public class MenuController {
      * @param gameMode Modo de juego ("PVC" para Player vs CPU, "PVP" para Player vs Player)
      */
     public void navigateToDeployment(String gameMode) {
-        // ✓ PRIMERO obtener el Stage
         Stage currentStage = null;
 
         if (playView != null && playView.getScene() != null) {
@@ -273,14 +301,15 @@ public class MenuController {
             return;
         }
 
-        // ✓ DESPUÉS limpiar las referencias
         clearViewReferences();
 
         // Crear el tablero del jugador
         Board playerBoard = new Board();
 
+        User currentPlayer = dataManager.getLoggedUsers().isEmpty() ? null : dataManager.getLoggedUsers().get(0);
+
         // Crear la vista de deployment
-        this.deploymentView = new DeploymentView(this, gameMode);
+        this.deploymentView = new DeploymentView(this, gameMode, currentPlayer);
 
         // Mostrar la vista
         deploymentView.start(currentStage);
@@ -290,25 +319,64 @@ public class MenuController {
     }
 
     /**
+     * Navega a la pantalla de transición entre jugadores (solo PVP).
+     */
+    public void navigateToTransition(String gameMode) {
+        Stage currentStage = null;
+
+        if (deploymentView != null && deploymentView.getScene() != null) {
+            currentStage = (Stage) deploymentView.getScene().getWindow();
+        } else {
+            System.err.println("ERROR: deploymentView is null");
+            return;
+        }
+
+        clearViewReferences();
+
+        // Obtener el segundo jugador
+        User nextPlayer = dataManager.getLoggedUsers().size() > 1 ?
+                dataManager.getLoggedUsers().get(1) : null;
+
+        this.transitionView = new TransitionView(this, nextPlayer, gameMode);
+        transitionView.start(currentStage);
+    }
+
+    /**
+     * Navega al deployment del segundo jugador.
+     */
+    public void navigateToSecondPlayerDeployment(String gameMode) {
+        Stage currentStage = null;
+
+        if (transitionView != null && transitionView.getScene() != null) {
+            currentStage = (Stage) transitionView.getScene().getWindow();
+        } else {
+            System.err.println("ERROR: transitionView is null");
+            return;
+        }
+
+        clearViewReferences();
+
+        Board player2Board = new Board();
+        User player2 = dataManager.getLoggedUsers().size() > 1 ?
+                dataManager.getLoggedUsers().get(1) : null;
+
+        this.deploymentView = new DeploymentView(this, gameMode, player2);
+        deploymentView.start(currentStage);
+
+        new DeploymentController(player2Board, deploymentView, this);
+    }
+
+    /**
      * Navega a la vista de juego (batalla).
-     * Este método se llamará cuando el usuario termine de colocar sus barcos.
      *
-     * @param playerBoard Tablero del jugador con todos los barcos colocados
+     * @param player1Board Tablero del jugador 1 con barcos colocados
+     * @param player2Board Tablero del jugador 2 con barcos colocados (null en modo PVC)
      * @param gameMode Modo de juego ("PVC" o "PVP")
      */
-    public void navigateToGame(Board playerBoard, String gameMode) {
-        // TODO: Implementar cuando tengas GameView
-        System.out.println("=================================");
-        System.out.println("Navegando a GameView");
-        System.out.println("Modo: " + gameMode);
-        System.out.println("Barcos colocados: " + playerBoard.getPlacedShipsCount());
-        System.out.println("=================================");
-
-        // Por ahora, volver al menú
-        navigateToGameMenu();
-
-        /*
-        // Cuando implementes GameView, descomentar esto:
+    public void navigateToGame(Board player1Board, Board player2Board, String gameMode) {
+        System.out.println("=== NAVIGATING TO GAME ===");
+        System.out.println("Game Mode: " + gameMode);
+        System.out.println("Player 1 ships: " + player1Board.getPlacedShipsCount());
 
         Stage currentStage = null;
 
@@ -321,33 +389,111 @@ public class MenuController {
 
         clearViewReferences();
 
-        // Crear tablero del enemigo (CPU o segundo jugador)
-        Board enemyBoard = new Board();
+        // Obtener usuarios
+        User player1 = dataManager.getLoggedUsers().isEmpty() ? null : dataManager.getLoggedUsers().get(0);
+        User player2 = null;
 
-        // Si es PVC, colocar barcos automáticamente para la CPU
+        // Si es modo PVC, crear tablero de CPU con barcos aleatorios
         if (gameMode.equals("PVC")) {
-            placeShipsRandomly(enemyBoard);
+            System.out.println("Creating CPU board...");
+            player2Board = new Board();
+            placeShipsRandomly(player2Board);
+            player2 = null;  // CPU no tiene usuario
+            System.out.println("CPU board created with " + player2Board.getPlacedShipsCount() + " ships");
+        } else {
+            // Modo PVP
+            player2 = dataManager.getLoggedUsers().size() > 1 ? dataManager.getLoggedUsers().get(1) : null;
+            System.out.println("Player 2: " + (player2 != null ? player2.getUsername() : "Unknown"));
+            System.out.println("Player 2 ships: " + player2Board.getPlacedShipsCount());
         }
 
         // Crear vista de juego
-        this.gameView = new GameView(this, playerBoard, enemyBoard, gameMode);
-
-        // Crear controlador de juego
-        new GameController(playerBoard, enemyBoard, gameView, this);
-
-        // Mostrar vista
+        this.gameView = new GameView(this, player1, player2, gameMode);
         gameView.start(currentStage);
-        */
+
+        // ✓ CRÍTICO: Crear el controlador DESPUÉS de que la vista esté inicializada
+        System.out.println("Creating GameController...");
+        new GameController(player1Board, player2Board, gameView, this);
+        System.out.println("Game initialized successfully");
     }
 
-    public void logoutUser(User user) {
-        dataManager.deleteLoggedUser(user);
+    /**
+     * Coloca barcos aleatoriamente en el tablero (para CPU).
+     *
+     * @param board Tablero donde colocar los barcos
+     */
+    private void placeShipsRandomly(Board board) {
+        java.util.Random random = new java.util.Random();
 
-        if (dataManager.isLoggedEmpty()) {
-            navigateToLogin();
-        } else {
-            navigateToGameMenu();
+        // Para cada tipo de barco
+        for (ShipType type : ShipType.values()) {
+            int quantity = board.getRemainingShips(type);
+
+            for (int i = 0; i < quantity; i++) {
+                boolean placed = false;
+                int attempts = 0;
+
+                while (!placed && attempts < 100) {
+                    // Generar posición aleatoria
+                    int row = random.nextInt(Board.BOARD_SIZE);
+                    int col = random.nextInt(Board.BOARD_SIZE);
+
+                    // Crear barco
+                    Ship ship = new Ship(type);
+
+                    // ✓ Orientación aleatoria: rotar o no rotar
+                    if (random.nextBoolean()) {
+                        ship.rotate();  // Esto cambia a VERTICAL
+                    }
+                    // Si no se rota, queda en HORIZONTAL (por defecto)
+
+                    // Intentar colocar
+                    if (board.canPlaceShip(ship, row, col)) {
+                        board.placeShip(ship, row, col);
+                        placed = true;
+
+                        if (attempts > 0) {
+                            System.out.println("  " + type + " colocado en intento " + (attempts + 1));
+                        }
+                    }
+
+                    attempts++;
+                }
+
+                if (!placed) {
+                    System.err.println("WARNING: No se pudo colocar " + type + " después de 100 intentos");
+                    System.err.println("Estado del tablero:");
+                    System.err.println(board.toString());
+                }
+            }
         }
+
+        System.out.println("=== CPU Ships Placement Complete ===");
+        System.out.println("Total ships placed: " + board.getPlacedShipsCount());
+        System.out.println("Board state:");
+        System.out.println(board.toString());
+    }
+
+
+
+    /**
+     * Navega a la pantalla de victoria.
+     */
+    public void navigateToVictory(User winner, User loser, String gameMode, int totalTurns) {
+        Stage currentStage = null;
+
+        if (gameView != null && gameView.getScene() != null) {
+            currentStage = (Stage) gameView.getScene().getWindow();
+        } else {
+            System.err.println("ERROR: gameView is null");
+            return;
+        }
+
+        clearViewReferences();
+
+        // ✓ GUARDAR la referencia
+        this.victoryView = new VictoryView(this, winner, loser, gameMode, totalTurns);
+        victoryView.start(currentStage);
     }
 
     // ==================== GETTERS ====================

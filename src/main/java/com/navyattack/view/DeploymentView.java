@@ -13,6 +13,7 @@ import javafx.application.Application;
 import com.navyattack.view.components.BoardGridComponent;
 import com.navyattack.controller.MenuController;
 import com.navyattack.model.ShipType;
+import com.navyattack.model.User;
 
 /**
  * Vista para la fase de deployment (colocación de barcos).
@@ -42,9 +43,12 @@ public class DeploymentView extends Application {
 
     private String gameMode; // "PVP" o "PVC"
 
-    public DeploymentView(MenuController controller, String gameMode) {
+    private User currentPlayer;
+
+    public DeploymentView(MenuController controller, String gameMode, User currentPlayer) {
         this.menuController = controller;
         this.gameMode = gameMode;
+        this.currentPlayer = currentPlayer;
     }
 
     @Override
@@ -72,14 +76,19 @@ public class DeploymentView extends Application {
         VBox panel = new VBox(10);
         panel.setAlignment(Pos.CENTER);
 
+        // Mostrar nombre del jugador
+        String playerName = currentPlayer != null ? currentPlayer.getUsername() : "Player";
+        Label playerLabel = new Label(playerName.toUpperCase() + "'S FLEET");
+        playerLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
+        playerLabel.setTextFill(javafx.scene.paint.Color.YELLOW);
+
         Label title = new Label("PLACE YOUR SHIPS");
         title.setFont(Font.font("Arial", FontWeight.BOLD, 24));
         title.setTextFill(javafx.scene.paint.Color.WHITE);
 
-        // Crear componente de tablero (interactivo)
         boardGrid = new BoardGridComponent(10, true);
 
-        panel.getChildren().addAll(title, boardGrid.getGridPane());
+        panel.getChildren().addAll(playerLabel, title, boardGrid.getGridPane());
         return panel;
     }
 
@@ -404,5 +413,9 @@ public class DeploymentView extends Application {
 
     public String getGameMode() {
         return gameMode;
+    }
+
+    public User getCurrentPlayer() {
+        return currentPlayer;
     }
 }
