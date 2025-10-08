@@ -1,12 +1,12 @@
 package com.navyattack.controller;
 
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 import com.navyattack.model.*;
-import com.navyattack.view.GameView;
-import com.navyattack.view.TurnTransitionView;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
-import javafx.stage.Stage;
-import javafx.scene.Scene;
+import com.navyattack.view.GameView;
+import com.navyattack.view.TurnTransitionView;
 
 import java.util.List;
 
@@ -16,27 +16,24 @@ import java.util.List;
  */
 public class GameController {
 
+    private final GameView view;
     private final Board player1Board;
     private final Board player2Board;
-    private final GameView view;
     private final MenuController menuController;
 
+    private int turnCounter;
+    private CPU cpu = new CPU();
     private boolean isPlayer1Turn;
     private boolean hasAttackedThisTurn;
-    private int turnCounter;
 
     public GameController(Board player1Board, Board player2Board, GameView view, MenuController menuController) {
-        this.player1Board = player1Board;
-        this.player2Board = player2Board;
         this.view = view;
-        this.menuController = menuController;
+        this.turnCounter = 0;
         this.isPlayer1Turn = true;
         this.hasAttackedThisTurn = false;
-        this.turnCounter = 0;
-
-        System.out.println("=== GameController Initialized ===");
-        System.out.println("Player 1 ships: " + player1Board.getPlacedShipsCount());
-        System.out.println("Player 2 ships: " + player2Board.getPlacedShipsCount());
+        this.player1Board = player1Board;
+        this.player2Board = player2Board;
+        this.menuController = menuController;
 
         connectHandlers();
         initializeBoards();
@@ -44,18 +41,11 @@ public class GameController {
     }
 
     private void connectHandlers() {
-        System.out.println("Connecting handlers...");
-
-        // ✓ CRÍTICO: Conectar el handler de clicks en el tablero enemigo
         view.setOnEnemyBoardClick(this::handleAttack);
         view.setOnEndTurn(e -> handleEndTurn());
-
-        System.out.println("Handlers connected successfully");
     }
 
     private void initializeBoards() {
-        System.out.println("Initializing boards...");
-
         // ✓ Establecer nombres iniciales correctos
         String player1Name = view.getPlayer1() != null ? view.getPlayer1().getUsername() : "Player 1";
         String player2Name;
@@ -72,30 +62,44 @@ public class GameController {
         // Mostrar los barcos del jugador 1 en "mi tablero" (izquierda)
         displayShipsOnBoard(player1Board, view.getMyBoard());
 
-        // El tablero enemigo (derecha) NO muestra barcos
-        // Solo mostrará HITs y MISSes después de atacar
-
         // Actualizar contadores
         updateScores();
-
-        System.out.println("Boards initialized");
     }
 
-    private void displayShipsOnBoard(Board board, com.navyattack.view.components.BoardGridComponent gridComponent) {
+    private void displayShipsOnBoard(Board board, com.navyattack.view.components.BoardGridComponent grid) {
         List<Ship> ships = board.getShips();
-        System.out.println("Displaying " + ships.size() + " ships on board");
 
         for (Ship ship : ships) {
             if (ship.isPlaced()) {
                 List<int[]> positions = ship.getPositions();
-                gridComponent.showShipCells(positions);
+                grid.showShipCells(positions);
+            }
+        }
+    }
+
+    private void displayShipsAndAttacksOnBoard(Board board, com.navyattack.view.components.BoardGridComponent grid) {
+        List<Ship> ships = board.getShips();
+
+        for (Ship ship : ships) {
+            if (ship.isPlaced()) {
+                List<int[]> positions = ship.getPositions();
+                grid.showShipCells(positions);
+            }
+        }
+        for (int row = 0; row < Board.BOARD_SIZE; row++) {
+            for (int col = 0; col < Board.BOARD_SIZE; col++) {
+                CellState state = board.getCellState(row, col);
+
+                if (state == CellState.HIT) {
+                    grid.markHit(row, col);
+                } else if (state == CellState.MISS) {
+                    grid.markMiss(row, col);
+                }
             }
         }
     }
 
     private void handleAttack(ActionEvent e) {
-        System.out.println("=== ATTACK TRIGGERED ===");
-
         if (hasAttackedThisTurn) {
             view.showMessage("You already attacked this turn! Click 'END TURN' to continue.", true);
             return;
@@ -116,15 +120,11 @@ public class GameController {
         int row = pos[0];
         int col = pos[1];
 
-        System.out.println("Attack at: [" + row + ", " + col + "]");
-
         // Determinar qué tablero atacar
         Board targetBoard = isPlayer1Turn ? player2Board : player1Board;
 
         // Ejecutar ataque
         AttackResult result = targetBoard.attack(row, col);
-
-        System.out.println("Attack result: " + result);
 
         // Procesar resultado
         processAttackResult(result, row, col);
@@ -163,8 +163,6 @@ public class GameController {
     }
 
     private void handleEndTurn() {
-        System.out.println("=== END TURN ===");
-
         if (!hasAttackedThisTurn) {
             view.showMessage("You must attack before ending your turn!", true);
             return;
@@ -173,23 +171,29 @@ public class GameController {
         // Incrementar contador de turnos
         turnCounter++;
 
-        // Cambiar turno
-        isPlayer1Turn = !isPlayer1Turn;
+        // Cambiar turno (solo para PVP)
+        if (view.getGameMode().equals("PVP")) {
+            isPlayer1Turn = !isPlayer1Turn;
+        } 
         hasAttackedThisTurn = false;
-
-        System.out.println("Turn " + turnCounter + ": Now it's " + (isPlayer1Turn ? "Player 1" : "Player 2") + "'s turn");
 
         // Actualizar UI
         view.enableEndTurnButton(false);
         updateTurnDisplay();
 
-        // Si es modo PVP, mostrar pantalla de transición de turno
         if (view.getGameMode().equals("PVP")) {
             showTurnTransition();
         } else {
-            // Modo PVC: turno de la CPU
+            // Turno de la CPU
+            int[] posAttack = cpu.attack();
+            AttackResult result = player1Board.attack(posAttack[0], posAttack[1]);
+           
+            // La CPU aprende del resultado para su próximo ataque
+            cpu.processResult(result, posAttack);
+
+            // Actualiza el tablero con el ataque de CPU
+            displayShipsAndAttacksOnBoard(player1Board, view.getMyBoard());
             view.enableEnemyBoard();
-            // TODO: Implementar IA de CPU (por ahora el jugador sigue atacando)
         }
     }
 
@@ -200,12 +204,8 @@ public class GameController {
             return;
         }
 
-        System.out.println("=== SHOWING TURN TRANSITION ===");
-
         // Modo PVP: mostrar pantalla de transición
-        String nextPlayerName = isPlayer1Turn ?
-                (view.getPlayer1() != null ? view.getPlayer1().getUsername() : "Player 1") :
-                (view.getPlayer2() != null ? view.getPlayer2().getUsername() : "Player 2");
+        String nextPlayerName = isPlayer1Turn ? view.getPlayer1().getUsername() : view.getPlayer2().getUsername();
 
         // ✓ Obtener Stage y Scene ANTES de crear la transición
         Stage stage = (Stage) view.getScene().getWindow();
@@ -215,8 +215,6 @@ public class GameController {
             System.err.println("ERROR: Stage is null!");
             return;
         }
-
-        System.out.println("Creating transition for: " + nextPlayerName);
 
         // ✓ Pasar el Stage Y la Scene original
         TurnTransitionView transitionView = new TurnTransitionView(
@@ -230,23 +228,14 @@ public class GameController {
     }
 
     private void continueAfterTransition() {
-        System.out.println("=== CONTINUING AFTER TRANSITION ===");
-
-        // ✓ Ya no necesitas restaurar la escena aquí porque TurnTransitionView lo hace
-        // La escena ya fue restaurada cuando se presionó el botón
-
         // Intercambiar displays de tableros
         swapBoardDisplays();
 
         // Habilitar tablero enemigo
         view.enableEnemyBoard();
-
-        System.out.println("Transition complete, board enabled");
     }
 
     private void swapBoardDisplays() {
-        System.out.println("=== SWAPPING BOARD DISPLAYS ===");
-
         // Limpiar ambos tableros
         view.getMyBoard().clearAll();
         view.getEnemyBoard().clearAll();
@@ -261,7 +250,7 @@ public class GameController {
 
         // En modo PVC, el enemigo siempre es CPU
         if (view.getGameMode().equals("PVC")) {
-            myPlayerName = view.getPlayer1() != null ? view.getPlayer1().getUsername() : "Player 1";
+            myPlayerName = view.getPlayer1().getUsername();
             enemyPlayerName = "CPU";
         }
 
@@ -270,9 +259,6 @@ public class GameController {
 
         view.updateMyPlayerName(myPlayerName);
         view.updateEnemyPlayerName(enemyPlayerName);
-
-        System.out.println("My player: " + myPlayerName);
-        System.out.println("Enemy player: " + enemyPlayerName);
 
         // Mostrar barcos del jugador actual en "mi tablero"
         Board currentPlayerBoard = isPlayer1Turn ? player1Board : player2Board;
@@ -284,8 +270,6 @@ public class GameController {
 
         // Actualizar scores
         updateScores();
-
-        System.out.println("Board displays swapped");
     }
 
     private void displayAttacksOnEnemyBoard(Board board, com.navyattack.view.components.BoardGridComponent grid) {
@@ -304,8 +288,7 @@ public class GameController {
     }
 
     private void updateTurnDisplay() {
-        String currentPlayer = isPlayer1Turn ?
-                (view.getPlayer1() != null ? view.getPlayer1().getUsername() : "Player 1") :
+        String currentPlayer = isPlayer1Turn ? view.getPlayer1().getUsername() :
                 (view.getPlayer2() != null ? view.getPlayer2().getUsername() : "Player 2");
 
         view.updateCurrentTurn(currentPlayer);
@@ -336,8 +319,6 @@ public class GameController {
     }
 
     private void handleVictory() {
-        System.out.println("=== VICTORY! ===");
-
         User winner = isPlayer1Turn ? view.getPlayer1() : view.getPlayer2();
         User loser = isPlayer1Turn ? view.getPlayer2() : view.getPlayer1();
 
@@ -346,9 +327,6 @@ public class GameController {
         view.showMessage("🎉 " + winnerName + " WINS! 🎉", false);
         view.disableEnemyBoard();
         view.enableEndTurnButton(false);
-
-        System.out.println("Winner: " + winnerName);
-        System.out.println("Total turns: " + turnCounter);
 
         // Navegar a pantalla de victoria después de 2 segundos
         new Thread(() -> {

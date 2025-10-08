@@ -27,16 +27,16 @@ import com.navyattack.model.Authentication;
 
 public class MenuController {
 
+    private GameView gameView;
     private MenuView menuView;
     private PlayView playView;
     private LoginView loginView;
     private SignUpView signUpView;
     private HistoryView historyView;
-    private DeploymentView deploymentView;
     private DataManager dataManager;
-    private TransitionView transitionView;
-    private GameView gameView;
     private VictoryView victoryView;
+    private DeploymentView deploymentView;
+    private TransitionView transitionView;
 
     private static final String DATA_DIR = "data";
     private static final String USERS_FILE = "users.dat";
@@ -374,10 +374,6 @@ public class MenuController {
      * @param gameMode Modo de juego ("PVC" o "PVP")
      */
     public void navigateToGame(Board player1Board, Board player2Board, String gameMode) {
-        System.out.println("=== NAVIGATING TO GAME ===");
-        System.out.println("Game Mode: " + gameMode);
-        System.out.println("Player 1 ships: " + player1Board.getPlacedShipsCount());
-
         Stage currentStage = null;
 
         if (deploymentView != null && deploymentView.getScene() != null) {
@@ -395,26 +391,19 @@ public class MenuController {
 
         // Si es modo PVC, crear tablero de CPU con barcos aleatorios
         if (gameMode.equals("PVC")) {
-            System.out.println("Creating CPU board...");
             player2Board = new Board();
             placeShipsRandomly(player2Board);
             player2 = null;  // CPU no tiene usuario
-            System.out.println("CPU board created with " + player2Board.getPlacedShipsCount() + " ships");
         } else {
             // Modo PVP
-            player2 = dataManager.getLoggedUsers().size() > 1 ? dataManager.getLoggedUsers().get(1) : null;
-            System.out.println("Player 2: " + (player2 != null ? player2.getUsername() : "Unknown"));
-            System.out.println("Player 2 ships: " + player2Board.getPlacedShipsCount());
+            player2 = dataManager.getLoggedUsers().get(1);
         }
 
         // Crear vista de juego
         this.gameView = new GameView(this, player1, player2, gameMode);
         gameView.start(currentStage);
 
-        // ✓ CRÍTICO: Crear el controlador DESPUÉS de que la vista esté inicializada
-        System.out.println("Creating GameController...");
         new GameController(player1Board, player2Board, gameView, this);
-        System.out.println("Game initialized successfully");
     }
 
     /**
@@ -422,7 +411,7 @@ public class MenuController {
      *
      * @param board Tablero donde colocar los barcos
      */
-    private void placeShipsRandomly(Board board) {
+    public void placeShipsRandomly(Board board) {
         java.util.Random random = new java.util.Random();
 
         // Para cada tipo de barco
@@ -467,14 +456,7 @@ public class MenuController {
                 }
             }
         }
-
-        System.out.println("=== CPU Ships Placement Complete ===");
-        System.out.println("Total ships placed: " + board.getPlacedShipsCount());
-        System.out.println("Board state:");
-        System.out.println(board.toString());
     }
-
-
 
     /**
      * Navega a la pantalla de victoria.

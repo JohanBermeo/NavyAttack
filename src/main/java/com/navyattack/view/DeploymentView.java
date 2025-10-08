@@ -1,6 +1,7 @@
 package com.navyattack.view;
 
 import javafx.stage.Stage;
+import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.geometry.Pos;
 import javafx.geometry.Insets;
@@ -10,10 +11,10 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.application.Application;
 
-import com.navyattack.view.components.BoardGridComponent;
-import com.navyattack.controller.MenuController;
-import com.navyattack.model.ShipType;
 import com.navyattack.model.User;
+import com.navyattack.model.ShipType;
+import com.navyattack.controller.MenuController;
+import com.navyattack.view.components.BoardGridComponent;
 
 /**
  * Vista para la fase de deployment (colocación de barcos).
@@ -34,15 +35,14 @@ public class DeploymentView extends Application {
     private Button btnPlaceShip;
     private Button btnStartGame;
     private Button btnBack;
+    private Button btnRandom;
 
     // Labels de contadores
     private Label[] shipCountLabels;
 
     // Label de mensajes
     private Label messageLabel;
-
-    private String gameMode; // "PVP" o "PVC"
-
+    private String gameMode;
     private User currentPlayer;
 
     public DeploymentView(MenuController controller, String gameMode, User currentPlayer) {
@@ -146,12 +146,58 @@ public class DeploymentView extends Application {
         UtilsMenuView.styleButton(btnBack, "white", "#EDEDED", "black", "10px 0 10px 0");
         btnBack.setOnAction(e -> menuController.navigateToGameMenu());
 
+        // Botón de volver
+        btnRandom = new Button("Random board");
+        btnRandom.setMaxWidth(Double.MAX_VALUE);
+        btnRandom.setStyle(
+            "-fx-background-color: linear-gradient(to right, #5872C9 0%, #5872C9 50%, #C95858 50%, #C95858 100%);" +
+            "-fx-text-fill: white;" +
+            "-fx-font-size: 12px;" +
+            "-fx-font-weight: bold;" +
+            "-fx-background-radius: 5;" +
+ 	        "-fx-padding: 10px 0 10px 0;" +
+            "-fx-border-color: #FFFFFF;" +
+            "-fx-border-width: 2;" +
+            "-fx-border-radius: 5;"
+        );
+        
+        btnRandom.setOnMouseEntered(e -> {
+                btnRandom.setStyle(
+                    "-fx-background-color: linear-gradient(to left, #5872C9 0%, #5872C9 50%, #C95858 50%, #C95858 100%);" +
+                    "-fx-text-fill: white;" +
+                    "-fx-font-size: 12px;" +
+                    "-fx-font-weight: bold;" +
+                    "-fx-background-radius: 5;" +
+                    "-fx-padding: 10px 0 10px 0;" +
+                    "-fx-border-color: #FFFFFF;" +
+                    "-fx-border-width: 2;" +
+                    "-fx-border-radius: 5;"
+                );
+                btnRandom.setCursor(Cursor.HAND);
+            }
+        );
+        
+        btnRandom.setOnMouseExited(e -> 
+            btnRandom.setStyle(
+                "-fx-background-color: linear-gradient(to right, #5872C9 0%, #5872C9 50%, #C95858 50%, #C95858 100%);" +
+                "-fx-text-fill: white;" +
+                "-fx-font-size: 12px;" +
+                "-fx-font-weight: bold;" +
+                "-fx-background-radius: 5;" +
+                "-fx-padding: 10px 0 10px 0;" +
+                "-fx-border-color: #FFFFFF;" +
+                "-fx-border-width: 2;" +
+                "-fx-border-radius: 5;"
+            )
+        );
+
         panel.getChildren().addAll(
                 instructionLabel,
                 shipsContainer,
                 rotateBox,
                 messageLabel,
                 btnStartGame,
+                btnRandom,
                 btnBack
         );
 
@@ -374,6 +420,10 @@ public class DeploymentView extends Application {
 
     public void setOnStartGame(javafx.event.EventHandler<javafx.event.ActionEvent> handler) {
         btnStartGame.setOnAction(handler);
+    }
+
+    public void setOnRandomBoard(javafx.event.EventHandler<javafx.event.ActionEvent> handler) {
+        btnRandom.setOnAction(handler);
     }
 
     public void updateShipCount(ShipType type, int count) {

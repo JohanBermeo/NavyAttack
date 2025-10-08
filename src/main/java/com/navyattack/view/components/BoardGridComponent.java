@@ -1,12 +1,12 @@
 package com.navyattack.view.components;
-import javafx.scene.layout.GridPane;
-import javafx.scene.control.Button;
-import javafx.event.EventHandler;
+
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.Button;
+import javafx.scene.layout.GridPane;
 
 /**
- * Componente reutilizable que representa un tablero de juego.
- * NO es una vista completa, es un COMPONENTE que se puede incluir en otras vistas.
+ * Componente reutilizable que representa un tablero de juego
  */
 public class BoardGridComponent {
 
@@ -62,8 +62,6 @@ public class BoardGridComponent {
                 "-fx-border-width: 1px;";
     }
 
-    // ===== MÉTODOS PÚBLICOS =====
-
     public GridPane getGridPane() {
         return gridPane;
     }
@@ -95,8 +93,6 @@ public class BoardGridComponent {
                 cell.setOnAction(handler);
             }
         }
-
-        System.out.println("Cell click handler set successfully");
     }
 
     public void highlightCells(java.util.List<int[]> positions, String color) {
@@ -132,7 +128,7 @@ public class BoardGridComponent {
             cells[row][col].setStyle("-fx-background-color: #4444ff; -fx-border-color: #333;");
             cells[row][col].setText("○");
         }
-    }
+    }	
 
     public void clearHighlights() {
         for (int r = 0; r < size; r++) {

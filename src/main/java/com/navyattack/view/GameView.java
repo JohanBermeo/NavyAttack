@@ -82,7 +82,6 @@ public class GameView extends Application {
         panel.setAlignment(Pos.CENTER);
         panel.setPadding(new Insets(15));
         panel.setStyle("-fx-background-color: #34495e;");
-
         currentTurnLabel = new Label("CURRENT TURN: PLAYER 1");
         currentTurnLabel.setFont(Font.font("Arial", FontWeight.BOLD, 24));
         currentTurnLabel.setTextFill(javafx.scene.paint.Color.YELLOW);
@@ -101,17 +100,17 @@ public class GameView extends Application {
         panel.setPadding(new Insets(20));
 
         // Tablero propio (izquierda) - NO interactivo
-        VBox myBoardPanel = createBoardPanel(
-                "YOUR FLEET",
-                player1 != null ? player1.getUsername() : "Player 1",
-                true,   // isMyBoard = true
-                true    // showShips = true (no se usa actualmente)
+		VBox myBoardPanel = createBoardPanel(
+            "YOUR FLEET",
+            player1.getUsername(),
+            true,   // isMyBoard = true
+            true    // showShips = true (no se usa actualmente)
         );
 
         // Tablero enemigo (derecha) - ✓ SÍ interactivo
         VBox enemyBoardPanel = createBoardPanel(
                 "ENEMY WATERS",
-                player2 != null ? player2.getUsername() : (gameMode.equals("PVC") ? "CPU" : "Player 2"),
+                player2 != null ? player2.getUsername() : "CPU"),
                 false,  // isMyBoard = false (esto hace que sea interactivo)
                 false   // showShips = false
         );
@@ -159,8 +158,6 @@ public class GameView extends Application {
         boolean interactive = !isMyBoard;
         BoardGridComponent board = new BoardGridComponent(10, interactive);
 
-        System.out.println("Created board: " + title + " (interactive: " + interactive + ")");
-
         if (isMyBoard) {
             myBoard = board;
             myScoreLabel = new Label("Ships Remaining: 10");
@@ -200,32 +197,32 @@ public class GameView extends Application {
     private void styleButton(Button btn, String normalColor, String hoverColor) {
         btn.setStyle(
                 "-fx-background-color: " + normalColor + ";" +
-                        "-fx-text-fill: white;" +
-                        "-fx-font-size: 14px;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-background-radius: 10px;" +
-                        "-fx-padding: 10px 20px;"
+                "-fx-text-fill: white;" +
+                "-fx-font-size: 14px;" +
+                "-fx-font-weight: bold;" +
+                "-fx-background-radius: 10px;" +
+                "-fx-padding: 10px 20px;"
         );
         btn.setOnMouseEntered(e -> {
             if (!btn.isDisabled()) {
                 btn.setStyle(
                         "-fx-background-color: " + hoverColor + ";" +
-                                "-fx-text-fill: white;" +
-                                "-fx-font-size: 14px;" +
-                                "-fx-font-weight: bold;" +
-                                "-fx-background-radius: 10px;" +
-                                "-fx-padding: 10px 20px;" +
-                                "-fx-cursor: hand;"
+                        "-fx-text-fill: white;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-background-radius: 10px;" +
+                        "-fx-padding: 10px 20px;" +
+                        "-fx-cursor: hand;"
                 );
             }
         });
         btn.setOnMouseExited(e -> btn.setStyle(
                 "-fx-background-color: " + normalColor + ";" +
-                        "-fx-text-fill: white;" +
-                        "-fx-font-size: 14px;" +
-                        "-fx-font-weight: bold;" +
-                        "-fx-background-radius: 10px;" +
-                        "-fx-padding: 10px 20px;"
+                "-fx-text-fill: white;" +
+                "-fx-font-size: 14px;" +
+                "-fx-font-weight: bold;" +
+                "-fx-background-radius: 10px;" +
+                "-fx-padding: 10px 20px;"
         ));
     }
 

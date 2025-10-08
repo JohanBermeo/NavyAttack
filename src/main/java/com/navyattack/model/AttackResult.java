@@ -2,10 +2,6 @@ package com.navyattack.model;
 
 /**
  * Enumeración que representa los posibles resultados de un ataque en el juego.
- *
- * Esta clase es parte del MODELO DE DOMINIO porque representa conceptos
- * que existen en el juego real de Batalla Naval.
- *
  * @author NavyAttack Team
  * @version 1.0
  */

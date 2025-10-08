@@ -1,10 +1,10 @@
 package com.navyattack.controller;
 
 import com.navyattack.model.*;
-import com.navyattack.view.DeploymentView;
-import com.navyattack.view.components.BoardGridComponent;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
+import com.navyattack.view.DeploymentView;
+import com.navyattack.view.components.BoardGridComponent;
 
 import java.util.List;
 
@@ -16,9 +16,9 @@ public class DeploymentController {
 
     private final Board board;
     private final DeploymentView view;
-    private final DeploymentState deploymentState;
-    private final MenuController menuController;
     private static Board player1Board = null;
+    private final MenuController menuController;
+    private final DeploymentState deploymentState;
 
     public DeploymentController(Board board, DeploymentView view, MenuController menuController) {
         this.board = board;
@@ -41,6 +41,7 @@ public class DeploymentController {
         view.setOnRotateShip(e -> handleRotation());
         view.setOnPlaceShip(e -> handlePlacement());
         view.setOnStartGame(e -> handleStartGame());
+        view.setOnRandomBoard(e -> handleStartWithRandomBoard());
     }
 
     private void handleDeployShip(ShipType type) {
@@ -136,22 +137,42 @@ public class DeploymentController {
         String gameMode = view.getGameMode();
 
         if (gameMode.equals("PVP")) {
-            // Modo Player vs Player
             if (player1Board == null) {
                 // Este es el primer jugador
                 player1Board = board;
-                System.out.println("Player 1 deployment complete. Transitioning to Player 2...");
                 menuController.navigateToTransition(gameMode);
             } else {
                 // Este es el segundo jugador
                 Board player2Board = board;
-                System.out.println("Player 2 deployment complete. Starting battle...");
                 menuController.navigateToGame(player1Board, player2Board, gameMode);
                 // Resetear para la próxima partida
                 player1Board = null;
             }
         } else {
             // Modo Player vs CPU
+            menuController.navigateToGame(board, null, gameMode);
+        }
+    }
+
+    private void handleStartWithRandomBoard() {
+        String gameMode = view.getGameMode();
+
+        if (gameMode.equals("PVP")) {
+            if (player1Board == null) {
+                // Este es el primer jugador
+                player1Board = board;
+                menuController.placeShipsRandomly(player1Board);
+                menuController.navigateToTransition(gameMode);
+            } else {
+                // Este es el segundo jugador
+                Board player2Board = board;
+                menuController.placeShipsRandomly(player2Board);
+                menuController.navigateToGame(player1Board, player2Board, gameMode);
+                // Resetear para la próxima partida
+                player1Board = null;
+            }
+        } else {
+            menuController.placeShipsRandomly(board);
             menuController.navigateToGame(board, null, gameMode);
         }
     }
