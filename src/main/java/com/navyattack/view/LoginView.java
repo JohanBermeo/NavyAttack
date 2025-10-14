@@ -15,22 +15,25 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.BorderPane;
 
 import com.navyattack.controller.MenuController;
+import com.navyattack.controller.NavigationController;
 
 public class LoginView {
 
 	private Scene scene;
 	private Text messageLabel;
 	private TextField usuarioField;
-	private MenuController controller;
+	private MenuController menuController;
+	private NavigationController navigationController;
 	private PasswordField passwordField;
 
 	// Constructor que recibe la referencia del controlador
-	public LoginView(MenuController controller) {
-		this.controller = controller;
+	public LoginView(MenuController controller, NavigationController navigationController) {
+		this.menuController = controller;
+		this.navigationController = navigationController;
 	}
 	
 	public void start(Stage stage) {
-		if (controller.hasSingleUser()) {
+		if (menuController.hasSingleUser()) {
 			createSecondUserInterface(stage);
 		} else {
 			createMainInterface(stage);
@@ -76,7 +79,7 @@ public class LoginView {
 				
 		ImageView backArrow = UtilsMenuView.createImage("file:docs/Icons/png/flecha-pequena-izquierda.png"); 
 		backArrow.setStyle("-fx-cursor: hand;");                   
-		backArrow.setOnMouseClicked(e -> controller.navigateToGameMenu());
+		backArrow.setOnMouseClicked(e -> navigationController.navigateToGameMenu());
 
 		topPanel.getChildren().add(backArrow); 
 
@@ -147,7 +150,7 @@ public class LoginView {
 
 		// Texto para crear cuenta (solo en interfaz principal)
 		Text createAccountText = new Text("Create account");
-		createAccountText.setOnMouseClicked(e -> controller.navigateToSignUp());
+		createAccountText.setOnMouseClicked(e -> navigationController.navigateToSignUp());
 		UtilsMenuView.styleText(createAccountText);
 		
 		// Label para mensajes
@@ -168,12 +171,14 @@ public class LoginView {
 		String username = usuarioField.getText();
 		String password = passwordField.getText();
 		
-		boolean success = controller.handleLogin(username, password);
+		boolean success = menuController.handleLogin(username, password);
 		
-		if (!success) {
+		if (success) {
+			navigationController.navigateToGameMenu();
+		} else {
 			UtilsMenuView.showMessage("Incorrect credentials", "error", messageLabel);
 			passwordField.clear();
-		} 
+		}
 	}
 	
 	public Scene getScene() {

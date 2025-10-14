@@ -11,8 +11,8 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.application.Application;
 
-import com.navyattack.controller.MenuController;
 import com.navyattack.model.User;
+import com.navyattack.controller.NavigationController;
 
 /**
  * Vista de transición entre el deployment de jugadores.
@@ -22,11 +22,11 @@ import com.navyattack.model.User;
 public class TransitionView extends Application {
 
     private Scene scene;
-    private MenuController menuController;
     private User nextPlayer;
     private String gameMode;
+    private NavigationController menuController;
 
-    public TransitionView(MenuController controller, User nextPlayer, String gameMode) {
+    public TransitionView(NavigationController controller, User nextPlayer, String gameMode) {
         this.menuController = controller;
         this.nextPlayer = nextPlayer;
         this.gameMode = gameMode;

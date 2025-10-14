@@ -11,9 +11,9 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.application.Application;
 
-import com.navyattack.view.components.BoardGridComponent;
-import com.navyattack.controller.MenuController;
 import com.navyattack.model.User;
+import com.navyattack.controller.NavigationController;
+import com.navyattack.view.components.BoardGridComponent;
 
 /**
  * Vista principal del juego durante la batalla.
@@ -22,7 +22,7 @@ import com.navyattack.model.User;
 public class GameView extends Application {
 
     private Scene scene;
-    private MenuController menuController;
+    private NavigationController menuController;
 
     // Componentes de tablero
     private BoardGridComponent myBoard;
@@ -48,7 +48,7 @@ public class GameView extends Application {
     private User player2;
     private String gameMode;
 
-    public GameView(MenuController controller, User player1, User player2, String gameMode) {
+    public GameView(NavigationController controller, User player1, User player2, String gameMode) {
         this.menuController = controller;
         this.player1 = player1;
         this.player2 = player2;

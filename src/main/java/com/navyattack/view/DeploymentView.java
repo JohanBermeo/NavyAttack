@@ -13,7 +13,7 @@ import javafx.application.Application;
 
 import com.navyattack.model.User;
 import com.navyattack.model.ShipType;
-import com.navyattack.controller.MenuController;
+import com.navyattack.controller.NavigationController;
 import com.navyattack.view.components.BoardGridComponent;
 
 /**
@@ -23,8 +23,8 @@ import com.navyattack.view.components.BoardGridComponent;
 public class DeploymentView extends Application {
 
     private Scene scene;
-    private MenuController menuController;
     private BoardGridComponent boardGrid;
+    private NavigationController menuController;
 
     // Botones de deployment
     private Button btnDeployCarrier;
@@ -45,7 +45,7 @@ public class DeploymentView extends Application {
     private String gameMode;
     private User currentPlayer;
 
-    public DeploymentView(MenuController controller, String gameMode, User currentPlayer) {
+    public DeploymentView(NavigationController controller, String gameMode, User currentPlayer) {
         this.menuController = controller;
         this.gameMode = gameMode;
         this.currentPlayer = currentPlayer;

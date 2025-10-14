@@ -15,23 +15,26 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 
 import com.navyattack.controller.MenuController;
+import com.navyattack.controller.NavigationController;
 
 public class SignUpView {
 
 	private Scene scene;
 	private Text messageLabel;
 	private TextField usuarioField;
-	private MenuController controller;
 	private PasswordField passwordField;
+	private MenuController menuController;
 	private PasswordField confirmPasswordField;
+	private NavigationController navigationController;
 	
 	// Constructor que recibe la referencia del controlador
-	public SignUpView(MenuController controller) {
-		this.controller = controller;
+	public SignUpView(MenuController menuController,NavigationController controller) {
+		this.menuController = menuController;
+		this.navigationController = controller;
 	}
 	
 	public void start(Stage stage) {
-		if (controller.hasSingleUser()) {
+		if (menuController.hasSingleUser()) {
 			createSecondUserInterface(stage);
 		} else {
 			createMainInterface(stage);
@@ -76,7 +79,7 @@ public class SignUpView {
 				
 		ImageView backArrow = UtilsMenuView.createImage("file:docs/Icons/png/flecha-pequena-izquierda.png"); 
 		backArrow.setStyle("-fx-cursor: hand;");                   
-		backArrow.setOnMouseClicked(e -> controller.navigateToGameMenu());
+		backArrow.setOnMouseClicked(e -> navigationController.navigateToGameMenu());
 
 		topPanel.getChildren().add(backArrow); 
 
@@ -178,18 +181,19 @@ public class SignUpView {
 		
 		boolean success = false;
 		try {
-			success = controller.handleSignUp(username, password, passwordConfirm);
+			success = menuController.handleSignUp(username, password, passwordConfirm);
 		} catch (Exception e) {
 			UtilsMenuView.showMessage(e.getMessage(), "error", messageLabel);
 		}
 		if (success) {
 			UtilsMenuView.showMessage("Account created", "success", messageLabel);
+			navigationController.navigateToGameMenu();
 		}
 	}
 	
 	// Método para manejar el evento de sign in
 	private void handleSignIn() {
-		controller.navigateToLogin();
+		navigationController.navigateToLogin();
 	}
 
 	public Scene getScene() {

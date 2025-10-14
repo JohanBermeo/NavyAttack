@@ -13,8 +13,8 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.application.Application;
 
-import com.navyattack.controller.MenuController;
 import com.navyattack.model.User;
+import com.navyattack.controller.NavigationController;
 
 /**
  * Vista que se muestra al finalizar una partida.
@@ -22,18 +22,17 @@ import com.navyattack.model.User;
  */
 public class VictoryView extends Application {
 
-    private Scene scene;
-    private MenuController menuController;
-    private User winner;
     private User loser;
-    private String gameMode;
+    private Scene scene;
+    private User winner;
     private int totalTurns;
+    private String gameMode;
     private String timePlayed;
-    private long timePlayedMillis;
-    private int winnerShipsSunk;
     private int loserShipsSunk;
+    private int winnerShipsSunk;
+    private NavigationController menuController;
 
-    public VictoryView(MenuController controller, User winner, User loser, String gameMode,
+    public VictoryView(NavigationController controller, User winner, User loser, String gameMode,
                        int totalTurns, String timePlayed, long timePlayedMillis,
                        int winnerShipsSunk, int loserShipsSunk) {
         this.menuController = controller;
@@ -42,7 +41,6 @@ public class VictoryView extends Application {
         this.gameMode = gameMode;
         this.totalTurns = totalTurns;
         this.timePlayed = timePlayed;
-        this.timePlayedMillis = timePlayedMillis;
         this.winnerShipsSunk = winnerShipsSunk;
         this.loserShipsSunk = loserShipsSunk;
     }

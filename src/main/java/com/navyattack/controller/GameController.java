@@ -22,6 +22,7 @@ public class GameController {
     private final Board player1Board;
     private final Board player2Board;
     private final MenuController menuController;
+    private final NavigationController navigationController;
 
     private int turnCounter;
     private CPU cpu = new CPU();
@@ -29,7 +30,7 @@ public class GameController {
     private boolean hasAttackedThisTurn;
     private GameTimer gameTimer;
 
-    public GameController(Board player1Board, Board player2Board, GameView view, MenuController menuController) {
+    public GameController(Board player1Board, Board player2Board, GameView view, MenuController menuController, NavigationController navigationController) {
         this.view = view;
         this.turnCounter = 0;
         this.isPlayer1Turn = true;
@@ -37,6 +38,7 @@ public class GameController {
         this.player1Board = player1Board;
         this.player2Board = player2Board;
         this.menuController = menuController;
+        this.navigationController = navigationController;
 
         this.gameTimer = new GameTimer();
         view.bindTimer(gameTimer.timeStringProperty());
@@ -396,7 +398,7 @@ public class GameController {
             try {
                 Thread.sleep(2000);
                 javafx.application.Platform.runLater(() -> {
-                    menuController.navigateToVictory(winner, loser, view.getGameMode(),
+                    navigationController.navigateToVictory(winner, loser, view.getGameMode(),
                             turnCounter, finalTime, finalTimeMillis,
                             winnerShipsSunk, loserShipsSunk);
                 });

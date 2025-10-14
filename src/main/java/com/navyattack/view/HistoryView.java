@@ -11,16 +11,16 @@ import javafx.application.Application;
 import com.navyattack.model.User;
 import com.navyattack.model.History;
 import com.navyattack.model.UserStatistics;
-import com.navyattack.controller.MenuController;
+import com.navyattack.controller.NavigationController;
 
 public class HistoryView extends Application {
 
     private Scene scene;
     private User currentUser;
-    private MenuController controller;
+    private NavigationController controller;
     private ListView<History> historyListView;
 
-    public HistoryView(MenuController controller, User user) {
+    public HistoryView(NavigationController controller, User user) {
         this.controller = controller;
         this.currentUser = user;
     }

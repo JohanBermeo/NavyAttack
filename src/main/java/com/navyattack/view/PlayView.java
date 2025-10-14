@@ -17,14 +17,17 @@ import javafx.scene.effect.DropShadow;
 import javafx.application.Application;
 
 import com.navyattack.controller.MenuController;
+import com.navyattack.controller.NavigationController;
 
 public class PlayView extends Application {
     
     private Scene scene;
     private MenuController menuController;
+    private NavigationController navigationController;
     
-    public PlayView(MenuController menuController) {
+    public PlayView(MenuController menuController, NavigationController navigationController) {
         this.menuController = menuController;
+        this.navigationController = navigationController;
     }
     
     @Override
@@ -46,7 +49,7 @@ public class PlayView extends Application {
             "Player vs CPU",
             "🤖",
             () -> {
-                menuController.navigateToDeployment("PVC");
+                navigationController.navigateToDeployment("PVC");
             }
         );
         cardPlayerVsCPU.setStyle(
@@ -77,7 +80,7 @@ public class PlayView extends Application {
                     "👥",
                     () -> {
                         System.out.println("Iniciando modo Player vs Player");
-                        menuController.navigateToDeployment("PVP");
+                        navigationController.navigateToDeployment("PVP");
                     }
             );
 
@@ -191,7 +194,7 @@ public class PlayView extends Application {
         backButton.setPrefWidth(150); 
         UtilsMenuView.styleButton(backButton, "black", "#333333", "white", "5px 0 5px 0");
         backButton.setOnAction(e -> {
-            menuController.navigateToGameMenu();
+            navigationController.navigateToGameMenu();
         }); 
 
         bottomPanel.getChildren().add(backButton); 

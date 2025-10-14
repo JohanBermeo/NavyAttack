@@ -17,14 +17,14 @@ public class DeploymentController {
     private final Board board;
     private final DeploymentView view;
     private static Board player1Board = null;
-    private final MenuController menuController;
+    private final NavigationController controller;
     private final DeploymentState deploymentState;
 
-    public DeploymentController(Board board, DeploymentView view, MenuController menuController) {
+    public DeploymentController(Board board, DeploymentView view, NavigationController controller) {
         this.board = board;
         this.view = view;
         this.deploymentState = new DeploymentState();
-        this.menuController = menuController;
+        this.controller = controller;
 
         connectHandlers();
         updateShipCounts();
@@ -140,17 +140,17 @@ public class DeploymentController {
             if (player1Board == null) {
                 // Este es el primer jugador
                 player1Board = board;
-                menuController.navigateToTransition(gameMode);
+                controller.navigateToTransition(gameMode);
             } else {
                 // Este es el segundo jugador
                 Board player2Board = board;
-                menuController.navigateToGame(player1Board, player2Board, gameMode);
+                controller.navigateToGame(player1Board, player2Board, gameMode);
                 // Resetear para la próxima partida
                 player1Board = null;
             }
         } else {
             // Modo Player vs CPU
-            menuController.navigateToGame(board, null, gameMode);
+            controller.navigateToGame(board, null, gameMode);
         }
     }
 
@@ -161,19 +161,19 @@ public class DeploymentController {
             if (player1Board == null) {
                 // Este es el primer jugador
                 player1Board = board;
-                menuController.placeShipsRandomly(player1Board);
-                menuController.navigateToTransition(gameMode);
+                Board.placeShipsRandomly(player1Board);
+                controller.navigateToTransition(gameMode);
             } else {
                 // Este es el segundo jugador
                 Board player2Board = board;
-                menuController.placeShipsRandomly(player2Board);
-                menuController.navigateToGame(player1Board, player2Board, gameMode);
+                Board.placeShipsRandomly(player2Board);
+                controller.navigateToGame(player1Board, player2Board, gameMode);
                 // Resetear para la próxima partida
                 player1Board = null;
             }
         } else {
-            menuController.placeShipsRandomly(board);
-            menuController.navigateToGame(board, null, gameMode);
+            Board.placeShipsRandomly(board);
+            controller.navigateToGame(board, null, gameMode);
         }
     }
 
