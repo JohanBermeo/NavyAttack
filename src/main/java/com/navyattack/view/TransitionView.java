@@ -9,7 +9,6 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.application.Application;
 
 import com.navyattack.controller.NavigationController;
 
@@ -18,7 +17,7 @@ import com.navyattack.controller.NavigationController;
  * Se muestra para que el jugador 2 pueda tomar el control sin ver
  * los barcos del jugador 1.
  */
-public class TransitionView extends Application {
+public class TransitionView implements IView {
 
     private Scene scene;
     private String gameMode;
@@ -51,7 +50,7 @@ public class TransitionView extends Application {
         btnContinue.setPrefWidth(300);
         btnContinue.setPrefHeight(50);
         styleButton(btnContinue);
-        btnContinue.setOnAction(e -> handleContinue(primaryStage));
+        btnContinue.setOnAction(e -> handleContinue());
 
         root.getChildren().addAll(title, messageBox, btnContinue);
 
@@ -126,11 +125,11 @@ public class TransitionView extends Application {
         ));
     }
 
-    private void handleContinue(Stage stage) {
-        // Navegar al deployment del jugador 2
+    private void handleContinue() {
         menuController.navigateToSecondPlayerDeployment(gameMode);
     }
 
+    @Override
     public Scene getScene() {
         return scene;
     }

@@ -9,7 +9,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.application.Application;
 
 import com.navyattack.model.ShipType;
 import com.navyattack.controller.NavigationController;
@@ -19,7 +18,7 @@ import com.navyattack.view.components.BoardGridComponent;
  * Vista para la fase de deployment (colocación de barcos).
  * Esta vista se muestra ANTES de iniciar la batalla.
  */
-public class DeploymentView extends Application {
+public class DeploymentView implements IView {
 
     private Scene scene;
     private BoardGridComponent boardGrid;
@@ -143,9 +142,9 @@ public class DeploymentView extends Application {
         btnBack = new Button("Back to Menu");
         btnBack.setMaxWidth(Double.MAX_VALUE);
         UtilsMenuView.styleButton(btnBack, "white", "#EDEDED", "black", "10px 0 10px 0");
-        btnBack.setOnAction(e -> menuController.navigateToGameMenu());
+        btnBack.setOnAction(e -> menuController.navigateToView("menu"));
 
-        // Botón de volver
+        // Botón de tablero aleatorio
         btnRandom = new Button("Random board");
         btnRandom.setMaxWidth(Double.MAX_VALUE);
         btnRandom.setStyle(
@@ -154,7 +153,7 @@ public class DeploymentView extends Application {
             "-fx-font-size: 12px;" +
             "-fx-font-weight: bold;" +
             "-fx-background-radius: 5;" +
- 	        "-fx-padding: 10px 0 10px 0;" +
+             "-fx-padding: 10px 0 10px 0;" +
             "-fx-border-color: #FFFFFF;" +
             "-fx-border-width: 2;" +
             "-fx-border-radius: 5;"
@@ -385,6 +384,7 @@ public class DeploymentView extends Application {
 
     // ===== GETTERS PARA EL CONTROLADOR =====
 
+    @Override
     public Scene getScene() {
         return scene;
     }

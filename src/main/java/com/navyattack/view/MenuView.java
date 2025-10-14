@@ -22,7 +22,7 @@ import com.navyattack.model.History;
 import com.navyattack.controller.MenuController;
 import com.navyattack.controller.NavigationController;
  
-public class MenuView extends Application { 
+public class MenuView extends Application implements IView { 
 
     private Scene scene; 
     private MenuController menuController;
@@ -66,7 +66,7 @@ public class MenuView extends Application {
         ImageView imageAdd = UtilsMenuView.createImage("file:docs/Icons/png/001-botn-agregar.png");
         imageAdd.setStyle("-fx-cursor: hand;");
         imageAdd.setOnMouseClicked(event -> {
-            navigationController.navigateToSecondUserLogin();
+            navigationController.navigateToView("login");
         });
 
         Text rightText = new Text("Add new user"); 
@@ -85,7 +85,7 @@ public class MenuView extends Application {
             )
         );
         rightText.setOnMouseClicked(event -> {
-            navigationController.navigateToSecondUserLogin();
+            navigationController.navigateToView("login");
         });
         rightText.setFont(Font.font("Tahoma", FontWeight.BOLD, 20)); 
         rightText.setFill(javafx.scene.paint.Color.BLACK); 
@@ -120,7 +120,7 @@ public class MenuView extends Application {
         playBtn.setMaxWidth(125); 
         UtilsMenuView.styleButton(playBtn, "black", "#333333", "white", "10px 0 10px 0"); 
         playBtn.setOnAction(e -> { 
-            navigationController.navigateToPlay();
+            navigationController.navigateToView("play");
         }); 
 	    GridPane.setHalignment(playBtn, HPos.CENTER); 
         grid.add(playBtn, 0, 2, 1, 1); 
@@ -139,7 +139,7 @@ public class MenuView extends Application {
         UtilsMenuView.styleButton(logoutBtn, "white", "#EDEDED", "black", "10px 0 10px 0"); 
         logoutBtn.setOnAction(e -> { 
             navigationController.logoutUser(menuController.getLoggedUsers().get(0).getUsername());
-            navigationController.navigateToLogin();
+            navigationController.navigateToView("login");
         }); 
         GridPane.setHalignment(logoutBtn, HPos.CENTER); 
         grid.add(logoutBtn, 0, 4, 1, 1); 
@@ -192,7 +192,7 @@ public class MenuView extends Application {
         Button playBtn = new Button("PLAY"); 
         playBtn.setMaxWidth(125); 
 	    playBtn.setOnAction(e -> { 
-            navigationController.navigateToPlay();
+            navigationController.navigateToView("play");
         }); 
         UtilsMenuView.styleButton(playBtn, "black", "#333333", "white", "10px 0 10px 0"); 
         GridPane.setHalignment(playBtn, HPos.CENTER); 
@@ -236,7 +236,8 @@ public class MenuView extends Application {
         return userContainer;
     }
 
+    @Override
     public Scene getScene() { 
         return scene; 
     } 
-} 
+}

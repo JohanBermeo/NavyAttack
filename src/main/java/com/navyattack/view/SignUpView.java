@@ -17,7 +17,7 @@ import javafx.scene.layout.BorderPane;
 import com.navyattack.controller.MenuController;
 import com.navyattack.controller.NavigationController;
 
-public class SignUpView {
+public class SignUpView implements IView {
 
 	private Scene scene;
 	private Text messageLabel;
@@ -33,6 +33,7 @@ public class SignUpView {
 		this.navigationController = controller;
 	}
 	
+	@Override
 	public void start(Stage stage) {
 		if (menuController.hasSingleUser()) {
 			createSecondUserInterface(stage);
@@ -79,7 +80,7 @@ public class SignUpView {
 				
 		ImageView backArrow = UtilsMenuView.createImage("file:docs/Icons/png/flecha-pequena-izquierda.png"); 
 		backArrow.setStyle("-fx-cursor: hand;");                   
-		backArrow.setOnMouseClicked(e -> navigationController.navigateToGameMenu());
+		backArrow.setOnMouseClicked(e -> navigationController.navigateToView("menu"));
 
 		topPanel.getChildren().add(backArrow); 
 
@@ -187,15 +188,16 @@ public class SignUpView {
 		}
 		if (success) {
 			UtilsMenuView.showMessage("Account created", "success", messageLabel);
-			navigationController.navigateToGameMenu();
+			navigationController.navigateToView("menu");
 		}
 	}
 	
 	// Método para manejar el evento de sign in
 	private void handleSignIn() {
-		navigationController.navigateToLogin();
+		navigationController.navigateToView("login");
 	}
 
+	@Override
 	public Scene getScene() {
 		return scene;
 	}

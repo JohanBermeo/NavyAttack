@@ -11,7 +11,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.application.Application;
 
 import com.navyattack.controller.NavigationController;
 
@@ -19,7 +18,7 @@ import com.navyattack.controller.NavigationController;
  * Vista que se muestra al finalizar una partida.
  * Muestra el ganador y estadísticas detalladas del juego.
  */
-public class VictoryView extends Application {
+public class VictoryView implements IView {
 
     private String loser;
     private Scene scene;
@@ -224,7 +223,7 @@ public class VictoryView extends Application {
         Button btnMainMenu = new Button("MAIN MENU");
         btnMainMenu.setPrefWidth(200);
         styleButton(btnMainMenu, "#3498db", "#2980b9");
-        btnMainMenu.setOnAction(e -> menuController.navigateToGameMenu());
+        btnMainMenu.setOnAction(e -> menuController.navigateToView("menu"));
 
         box.getChildren().addAll(btnPlayAgain, btnMainMenu);
         return box;
@@ -259,9 +258,10 @@ public class VictoryView extends Application {
     }
 
     private void handlePlayAgain() {
-        menuController.navigateToPlay();
+        menuController.navigateToView("play");
     }
 
+    @Override
     public Scene getScene() {
         return scene;
     }

@@ -9,7 +9,6 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
 import javafx.scene.text.FontWeight;
-import javafx.application.Application;
 
 import com.navyattack.controller.NavigationController;
 import com.navyattack.view.components.BoardGridComponent;
@@ -18,7 +17,7 @@ import com.navyattack.view.components.BoardGridComponent;
  * Vista principal del juego durante la batalla.
  * Muestra dos tableros: uno propio (con barcos visibles) y uno enemigo (para atacar).
  */
-public class GameView extends Application {
+public class GameView implements IView {
 
     private Scene scene;
     private NavigationController menuController;
@@ -59,15 +58,12 @@ public class GameView extends Application {
         BorderPane root = new BorderPane();
         root.setStyle("-fx-background-color: #2c3e50;");
 
-        // Top: Información de turno y mensajes
         VBox topPanel = createTopPanel();
         root.setTop(topPanel);
 
-        // Center: Los dos tableros
         HBox centerPanel = createCenterPanel();
         root.setCenter(centerPanel);
 
-        // Bottom: Botones de control
         HBox bottomPanel = createBottomPanel();
         root.setBottom(bottomPanel);
 
@@ -234,7 +230,7 @@ public class GameView extends Application {
 
     private void handleSurrender() {
         // Mostrar diálogo de confirmación y volver al menú
-        menuController.navigateToGameMenu();
+        menuController.navigateToView("menu");;
     }
 
     public void updateMyPlayerName(String name) {
@@ -269,6 +265,7 @@ public class GameView extends Application {
 
     // ===== GETTERS Y SETTERS =====
 
+    @Override
     public Scene getScene() {
         return scene;
     }

@@ -19,7 +19,7 @@ import javafx.application.Application;
 import com.navyattack.controller.MenuController;
 import com.navyattack.controller.NavigationController;
 
-public class PlayView extends Application {
+public class PlayView extends Application implements IView {
     
     private Scene scene;
     private MenuController menuController;
@@ -194,13 +194,14 @@ public class PlayView extends Application {
         backButton.setPrefWidth(150); 
         UtilsMenuView.styleButton(backButton, "black", "#333333", "white", "5px 0 5px 0");
         backButton.setOnAction(e -> {
-            navigationController.navigateToGameMenu();
+            navigationController.navigateToView("menu");
         }); 
 
         bottomPanel.getChildren().add(backButton); 
         return bottomPanel; 
     }
 
+    @Override
     public Scene getScene() { 
         return scene; 
     }

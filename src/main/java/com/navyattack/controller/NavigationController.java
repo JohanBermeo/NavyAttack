@@ -3,283 +3,238 @@ package com.navyattack.controller;
 import javafx.stage.Stage;
 import javafx.application.Application;
 
+import java.util.Map;
+import java.util.HashMap;
+
 import com.navyattack.view.*;
 import com.navyattack.model.User;
 import com.navyattack.model.Board;
 
 public class NavigationController {
 
-   private GameView gameView;
-   private MenuView menuView;
-   private PlayView playView;
-   private LoginView loginView;
-   private SignUpView signUpView;
-   private HistoryView historyView;
-   private VictoryView victoryView;
-   private DeploymentView deploymentView;
-   private TransitionView transitionView;
-
+   private IView currentView;
    private final MenuController menuController;
+   private final Map<String, ViewFactory> viewRegistry;
 
    public NavigationController(MenuController menuController) {
       this.menuController = menuController;
+      this.viewRegistry = new HashMap<>();
+      registerDefaultViews();
    }
 
-   private void clearViewReferences() {
-      this.gameView = null;
-      this.playView = null;
-      this.menuView = null;
-      this.loginView = null;
-      this.signUpView = null;
-      this.victoryView = null;
-      this.historyView = null;
-      this.deploymentView = null;
-      this.transitionView = null;
+   /**
+    * Registra todas las vistas por defecto del sistema.
+    * Este método puede ser extendido sin modificar el código existente.
+    */
+   private void registerDefaultViews() {
+      // Vistas de autenticación
+      registerView("login", () -> new LoginView(menuController, this));
+      registerView("signup", () -> new SignUpView(menuController, this));
+      
+      // Vistas principales
+      registerView("menu", () -> new MenuView(menuController, this));
+      registerView("play", () -> new PlayView(menuController, this));
+      
+      // Vista de historial (placeholder - requiere parámetros dinámicos)
+      registerView("history", () -> new HistoryView(this, null, null));
+   }
+
+   /**
+    * Permite registrar nuevas vistas sin modificar el código existente.
+    * Cumple con el principio Open/Closed.
+    * 
+    * @param viewName Nombre único de la vista
+    * @param factory Factory que crea la instancia de la vista
+    */
+   public void registerView(String viewName, ViewFactory factory) {
+      viewRegistry.put(viewName, factory);
+   }
+
+   /**
+    * Obtiene el Stage actual desde la vista activa.
+    */
+   private Stage getCurrentStage() {
+      if (currentView != null && currentView.getScene() != null) {
+         return (Stage) currentView.getScene().getWindow();
+      }
+      System.err.println("ERROR: No se pudo obtener el Stage actual");
+      return null;
+   }
+
+   /**
+    * Navega a una vista registrada por su nombre.
+    */
+   public void navigateToView(String viewName) {
+      Stage stage = getCurrentStage();
+      if (stage == null) return;
+
+      ViewFactory factory = viewRegistry.get(viewName);
+      if (factory == null) {
+         System.err.println("ERROR: Vista no registrada: " + viewName);
+         return;
+      }
+
+      currentView = factory.create();
+      currentView.start(stage);
+   }
+
+   /**
+    * Navega a una vista específica ya instanciada.
+    * Útil para vistas que requieren parámetros dinámicos.
+    */
+   public void navigateToView(IView view) {
+      Stage stage = getCurrentStage();
+      if (stage == null) return;
+
+      currentView = view;
+      currentView.start(stage);
    }
 
    // ==================== MÉTODOS DE INICIALIZACIÓN ====================
 
+   /**
+    * Lanza la aplicación JavaFX.
+    */
    public static void launchApp(String[] args) {
       Application.launch(NavigationApplication.class, args);
    }
 
+   /**
+    * Inicializa la primera vista de la aplicación.
+    */
    public void initializeView(Stage primaryStage) {
-      this.loginView = new LoginView(menuController, this);
-      loginView.start(primaryStage);
+      currentView = new LoginView(menuController, this);
+      currentView.start(primaryStage);
    }
 
-   // ==================== MÉTODOS DE NAVEGACIÓN ====================
+   // ==================== MÉTODOS DE NAVEGACIÓN - VISTAS CON PARÁMETROS ====================
 
-   public void navigateToGameMenu() {
-      Stage currentStage = null;
-
-      if (loginView != null && loginView.getScene() != null) {
-         currentStage = (Stage) loginView.getScene().getWindow();
-      } else if (signUpView != null && signUpView.getScene() != null) {
-         currentStage = (Stage) signUpView.getScene().getWindow();
-      } else if (historyView != null && historyView.getScene() != null) {
-         currentStage = (Stage) historyView.getScene().getWindow();
-      } else if (playView != null && playView.getScene() != null) {
-         currentStage = (Stage) playView.getScene().getWindow();
-      } else if (menuView != null && menuView.getScene() != null) {
-         currentStage = (Stage) menuView.getScene().getWindow();
-      } else if (deploymentView != null && deploymentView.getScene() != null) {
-         currentStage = (Stage) deploymentView.getScene().getWindow();
-      } else if (gameView != null && gameView.getScene() != null) {
-         currentStage = (Stage) gameView.getScene().getWindow();
-      } else if (victoryView != null && victoryView.getScene() != null) {
-         currentStage = (Stage) victoryView.getScene().getWindow();
-      } else {
-         System.err.println("ERROR: No se pudo obtener el Stage actual");
-         return;
-      }
-
-      clearViewReferences();
-
-      this.menuView = new MenuView(menuController, this);
-      menuView.start(currentStage);
-   }
-
-   public void logoutUser(String username) {
-      menuController.logoutUser(username);
-
-      if (menuController.hasNoUsers()) {
-         navigateToLogin();
-      } else {
-         navigateToGameMenu();
-      }
-
-   }
-
-   public void navigateToSecondUserLogin() {
-      Stage currentStage;
-      if (menuView != null && menuView.getScene() != null) {
-         currentStage = (Stage) menuView.getScene().getWindow();
-      } else {
-         System.err.println("ERROR: menuView is null");
-         return;
-      }
-
-      clearViewReferences();
-      this.loginView = new LoginView(menuController, this);
-      loginView.start(currentStage);
-   }
-
-   public void navigateToSignUp() {
-      Stage currentStage;
-      if (loginView != null && loginView.getScene() != null) {
-         currentStage = (Stage) loginView.getScene().getWindow();
-      } else {
-         System.err.println("ERROR: loginView is null");
-         return;
-      }
-
-      clearViewReferences();
-      this.signUpView = new SignUpView(menuController, this);
-      signUpView.start(currentStage);
-   }
-
+   /**
+    * Navega a la vista de historial con datos específicos del usuario.
+    */
    public void navigateToHistory(String username, java.util.List<com.navyattack.model.History> history) {
-      Stage currentStage;
-      if (menuView != null && menuView.getScene() != null) {
-         currentStage = (Stage) menuView.getScene().getWindow();
-      } else {
-         System.err.println("ERROR: menuView is null");
-         return;
-      }
-
-      clearViewReferences();
-      this.historyView = new HistoryView(this, username, history);
-      historyView.start(currentStage);
+      IView historyView = new HistoryView(this, username, history);
+      navigateToView(historyView);
    }
 
-   public void navigateToPlay() {
-      Stage currentStage = null;
-
-      if (menuView != null && menuView.getScene() != null) {
-         currentStage = (Stage) menuView.getScene().getWindow();
-      } else if (victoryView != null && victoryView.getScene() != null) {
-         currentStage = (Stage) victoryView.getScene().getWindow();
-      } else {
-         System.err.println("ERROR: No se pudo obtener el Stage para navigateToPlay");
-         return;
-      }
-
-      clearViewReferences();
-      this.playView = new PlayView(menuController, this);
-      playView.start(currentStage);
-   }
-
-   public void navigateToLogin() {
-      Stage currentStage = null;
-
-      if (signUpView != null && signUpView.getScene() != null) {
-         currentStage = (Stage) signUpView.getScene().getWindow();
-      } else if (menuView != null && menuView.getScene() != null) {
-         currentStage = (Stage) menuView.getScene().getWindow();
-      } else {
-         System.err.println("ERROR: No se pudo obtener el Stage");
-         return;
-      }
-
-      clearViewReferences();
-      this.loginView = new LoginView(menuController, this);
-      loginView.start(currentStage);
-   }
-
+   /**
+    * Navega a la vista de deployment (colocación de barcos) del primer jugador.
+    */
    public void navigateToDeployment(String gameMode) {
-      Stage currentStage = null;
-
-      if (playView != null && playView.getScene() != null) {
-         currentStage = (Stage) playView.getScene().getWindow();
-      } else {
-         System.err.println("ERROR: playView is null or has no scene");
-         return;
-      }
-
-      clearViewReferences();
+      Stage stage = getCurrentStage();
+      if (stage == null) return;
 
       Board playerBoard = new Board();
-      User currentPlayer = menuController.getLoggedUsers().isEmpty() ? null : menuController.getLoggedUsers().get(0);
+      User currentPlayer = menuController.getLoggedUsers().isEmpty() ? 
+                           null : menuController.getLoggedUsers().get(0);
 
-      this.deploymentView = new DeploymentView(this, gameMode, currentPlayer.getUsername());
-      deploymentView.start(currentStage);
+      DeploymentView deploymentView = new DeploymentView(this, gameMode, currentPlayer.getUsername());
+      currentView = deploymentView;
+      deploymentView.start(stage);
 
       new DeploymentController(playerBoard, deploymentView, this);
    }
 
+   /**
+    * Navega a la vista de transición entre jugadores en modo PvP.
+    */
    public void navigateToTransition(String gameMode) {
-      Stage currentStage = null;
+      User nextPlayer = menuController.getLoggedUsers().size() > 1 ?
+                        menuController.getLoggedUsers().get(1) : null;
 
-      if (deploymentView != null && deploymentView.getScene() != null) {
-         currentStage = (Stage) deploymentView.getScene().getWindow();
-      } else {
-         System.err.println("ERROR: deploymentView is null");
+      if (nextPlayer == null) {
+         System.err.println("ERROR: No hay segundo jugador para la transición");
          return;
       }
 
-      clearViewReferences();
-
-      User nextPlayer = menuController.getLoggedUsers().size() > 1 ?
-               menuController.getLoggedUsers().get(1) : null;
-
-      this.transitionView = new TransitionView(this, nextPlayer.getUsername(), gameMode);
-      transitionView.start(currentStage);
+      TransitionView transitionView = new TransitionView(this, nextPlayer.getUsername(), gameMode);
+      navigateToView(transitionView);
    }
 
+   /**
+    * Navega a la vista de deployment del segundo jugador en modo PvP.
+    */
    public void navigateToSecondPlayerDeployment(String gameMode) {
-      Stage currentStage = null;
-
-      if (transitionView != null && transitionView.getScene() != null) {
-         currentStage = (Stage) transitionView.getScene().getWindow();
-      } else {
-         System.err.println("ERROR: transitionView is null");
-         return;
-      }
-
-      clearViewReferences();
+      Stage stage = getCurrentStage();
+      if (stage == null) return;
 
       Board player2Board = new Board();
       User player2 = menuController.getLoggedUsers().size() > 1 ?
-               menuController.getLoggedUsers().get(1) : null;
+                     menuController.getLoggedUsers().get(1) : null;
 
-      this.deploymentView = new DeploymentView(this, gameMode, player2.getUsername());
-      deploymentView.start(currentStage);
+      if (player2 == null) {
+         System.err.println("ERROR: No hay segundo jugador registrado");
+         return;
+      }
+
+      DeploymentView deploymentView = new DeploymentView(this, gameMode, player2.getUsername());
+      currentView = deploymentView;
+      deploymentView.start(stage);
 
       new DeploymentController(player2Board, deploymentView, this);
    }
 
+   /**
+    * Navega a la vista principal del juego (batalla).
+    */
    public void navigateToGame(Board player1Board, Board player2Board, String gameMode) {
-      Stage currentStage = null;
+      Stage stage = getCurrentStage();
+      if (stage == null) return;
 
-      if (deploymentView != null && deploymentView.getScene() != null) {
-         currentStage = (Stage) deploymentView.getScene().getWindow();
-      } else {
-         System.err.println("ERROR: deploymentView is null");
-         return;
-      }
-
-      clearViewReferences();
-
-      String player1 = menuController.getLoggedUsers().isEmpty() ? null : menuController.getLoggedUsers().get(0).getUsername();
+      String player1 = menuController.getLoggedUsers().isEmpty() ? 
+                       null : menuController.getLoggedUsers().get(0).getUsername();
       String player2 = null;
 
       if (gameMode.equals("PVC")) {
+         // Modo Player vs CPU: generar tablero aleatorio para la CPU
          player2Board = new Board();
          Board.placeShipsRandomly(player2Board);
          player2 = null;
       } else {
-         player2 = menuController.getLoggedUsers().get(1).getUsername();
+         // Modo Player vs Player: usar segundo jugador registrado
+         player2 = menuController.getLoggedUsers().size() > 1 ?
+                   menuController.getLoggedUsers().get(1).getUsername() : null;
       }
 
-      this.gameView = new GameView(this, player1, player2, gameMode);
-      gameView.start(currentStage);
+      GameView gameView = new GameView(this, player1, player2, gameMode);
+      currentView = gameView;
+      gameView.start(stage);
 
       new GameController(player1Board, player2Board, gameView, menuController, this);
    }
 
+   /**
+    * Navega a la vista de victoria con todas las estadísticas de la partida.
+    */
    public void navigateToVictory(String winner, String loser, String gameMode, int totalTurns,
                                  String timePlayed, long timePlayedMillis,
                                  int winnerShipsSunk, int loserShipsSunk) {
-      Stage currentStage = null;
+      VictoryView victoryView = new VictoryView(this, winner, loser, gameMode, totalTurns,
+                                                timePlayed, timePlayedMillis,
+                                                winnerShipsSunk, loserShipsSunk);
+      navigateToView(victoryView);
+   }
 
-      if (gameView != null && gameView.getScene() != null) {
-         currentStage = (Stage) gameView.getScene().getWindow();
+   // ==================== MÉTODOS DE GESTIÓN DE USUARIOS ====================
+
+   /**
+    * Cierra la sesión de un usuario y navega a la vista apropiada.
+    */
+   public void logoutUser(String username) {
+      menuController.logoutUser(username);
+
+      if (menuController.hasNoUsers()) {
+         navigateToView("login");
       } else {
-         System.err.println("ERROR: gameView is null");
-         return;
+         navigateToView("menu");
       }
-
-      clearViewReferences();
-
-      this.victoryView = new VictoryView(this, winner, loser, gameMode, totalTurns,
-               timePlayed, timePlayedMillis,
-               winnerShipsSunk, loserShipsSunk);
-      victoryView.start(currentStage);
    }
 
    // ==================== CLASE INTERNA ====================
 
+   /**
+    * Clase interna para iniciar la aplicación JavaFX.
+    */
    public static class NavigationApplication extends Application {
       @Override
       public void start(Stage primaryStage) {
@@ -288,5 +243,4 @@ public class NavigationController {
          controller.initializeView(primaryStage);
       }
    }
-
 }

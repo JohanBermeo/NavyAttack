@@ -7,13 +7,12 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.geometry.Insets;
-import javafx.application.Application;
 
 import com.navyattack.model.History;
 import com.navyattack.model.UserStatistics;
 import com.navyattack.controller.NavigationController;
 
-public class HistoryView extends Application {
+public class HistoryView implements IView {
 
     private Scene scene;
     private String username;
@@ -58,7 +57,6 @@ public class HistoryView extends Application {
         Label titleLabel = new Label("History - " + username);
         titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;");
 
-        // ✓ NUEVO: Panel de estadísticas generales
         HBox statsPanel = createStatsPanel();
 
         topPanel.getChildren().addAll(titleLabel, statsPanel);
@@ -79,22 +77,11 @@ public class HistoryView extends Application {
 
         UserStatistics stats = new UserStatistics(username, history);
 
-        // Juegos totales
         VBox gamesBox = createStatBox("🎮", "Games", String.valueOf(stats.getTotalGames()));
-
-        // Victorias
         VBox winsBox = createStatBox("🏆", "Wins", String.valueOf(stats.getVictories()));
-
-        // Derrotas
         VBox lossesBox = createStatBox("💀", "Losses", String.valueOf(stats.getDefeats()));
-
-        // Win Rate
         VBox winRateBox = createStatBox("📊", "Win Rate", String.format("%.1f%%", stats.getWinRate()));
-
-        // Barcos hundidos
         VBox shipsSunkBox = createStatBox("⚓", "Ships Sunk", String.valueOf(stats.getTotalShipsSunk()));
-
-        // Tiempo total
         VBox timeBox = createStatBox("⏱", "Total Time", stats.getTotalPlayTimeFormatted());
 
         panel.getChildren().addAll(gamesBox, winsBox, lossesBox, winRateBox, shipsSunkBox, timeBox);
@@ -167,7 +154,6 @@ public class HistoryView extends Application {
     private void loadHistories() {
         if (history != null) {
             historyListView.getItems().clear();
-            // Mostrar las partidas más recientes primero
             java.util.List<History> reversed = new java.util.ArrayList<>(history);
             java.util.Collections.reverse(reversed);
             historyListView.getItems().addAll(reversed);
@@ -183,7 +169,7 @@ public class HistoryView extends Application {
         backButton.setPrefWidth(150);
         UtilsMenuView.styleButton(backButton, "black", "#333333", "white", "5px 0 5px 0");
         backButton.setOnAction(e -> {
-            controller.navigateToGameMenu();
+            controller.navigateToView("menu");
         });
 
         bottomPanel.getChildren().add(backButton);
@@ -210,7 +196,6 @@ public class HistoryView extends Application {
             VBox card = new VBox(10);
             card.setPadding(new Insets(15));
 
-            // Determinar si el jugador principal ganó
             boolean playerWon = history.didPlayerWin(username);
             String backgroundColor = playerWon ? "#e8f5e9" : "#ffebee";
             String borderColor = playerWon ? "#4caf50" : "#f44336";
@@ -224,7 +209,6 @@ public class HistoryView extends Application {
                     backgroundColor, borderColor
             ));
 
-            // Header: Resultado y fecha
             HBox header = new HBox();
             header.setAlignment(Pos.CENTER);
             header.setSpacing(15);
@@ -245,10 +229,7 @@ public class HistoryView extends Application {
 
             header.getChildren().addAll(resultLabel, spacer, dateLabel);
 
-            // Sección de jugadores
             HBox playersSection = createPlayersSection(history, playerWon);
-
-            // Estadísticas de la partida
             GridPane statsGrid = createMatchStatsGrid(history);
 
             card.getChildren().addAll(header, new Separator(), playersSection, statsGrid);
@@ -260,7 +241,6 @@ public class HistoryView extends Application {
             section.setAlignment(Pos.CENTER);
             section.setPadding(new Insets(5, 0, 5, 0));
 
-            // Jugador actual
             VBox playerBox = new VBox(3);
             playerBox.setAlignment(Pos.CENTER);
 
@@ -272,11 +252,9 @@ public class HistoryView extends Application {
 
             playerBox.getChildren().addAll(playerIcon, playerName);
 
-            // VS
             Label vsLabel = new Label("VS");
             vsLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #666666;");
 
-            // Oponente
             VBox opponentBox = new VBox(3);
             opponentBox.setAlignment(Pos.CENTER);
 
@@ -300,24 +278,14 @@ public class HistoryView extends Application {
             grid.setVgap(5);
             grid.setPadding(new Insets(10, 0, 0, 0));
 
-            // Determinar si el jugador ganó para mostrar stats correctas
             boolean playerWon = history.didPlayerWin(username);
             int playerShipsSunk = playerWon ? history.getWinnerShipsSunk() : history.getLoserShipsSunk();
             int opponentShipsSunk = playerWon ? history.getLoserShipsSunk() : history.getWinnerShipsSunk();
 
-            // Modo de juego
             addStatToGrid(grid, 0, 0, "🎮", history.getGameMode().equals("PVC") ? "vs CPU" : "vs Player");
-
-            // Tiempo
             addStatToGrid(grid, 1, 0, "⏱", history.getTimePlayed());
-
-            // Turnos
             addStatToGrid(grid, 2, 0, "🔄", history.getTotalTurns() + " turns");
-
-            // Barcos hundidos (jugador)
             addStatToGrid(grid, 0, 1, "⚓", playerShipsSunk + " sunk");
-
-            // Barcos perdidos (jugador)
             addStatToGrid(grid, 1, 1, "💥", opponentShipsSunk + " lost");
 
             return grid;
