@@ -118,6 +118,10 @@ public class MenuController {
         this.victoryView = null;
     }
 
+    public void saveGameData() {
+        saveUserData();
+    }
+
     // ==================== MÉTODOS DE INICIALIZACIÓN ====================
 
     public void initializeView(Stage primaryStage) {
@@ -461,7 +465,9 @@ public class MenuController {
     /**
      * Navega a la pantalla de victoria.
      */
-    public void navigateToVictory(User winner, User loser, String gameMode, int totalTurns) {
+    public void navigateToVictory(User winner, User loser, String gameMode, int totalTurns,
+                                  String timePlayed, long timePlayedMillis,
+                                  int winnerShipsSunk, int loserShipsSunk) {
         Stage currentStage = null;
 
         if (gameView != null && gameView.getScene() != null) {
@@ -473,8 +479,10 @@ public class MenuController {
 
         clearViewReferences();
 
-        // ✓ GUARDAR la referencia
-        this.victoryView = new VictoryView(this, winner, loser, gameMode, totalTurns);
+        // ✓ Pasar los nuevos parámetros a VictoryView
+        this.victoryView = new VictoryView(this, winner, loser, gameMode, totalTurns,
+                timePlayed, timePlayedMillis,
+                winnerShipsSunk, loserShipsSunk);
         victoryView.start(currentStage);
     }
 

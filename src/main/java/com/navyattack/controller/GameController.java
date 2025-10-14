@@ -2,11 +2,13 @@ package com.navyattack.controller;
 
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import com.navyattack.model.*;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
+
+import com.navyattack.model.*;
 import com.navyattack.view.GameView;
 import com.navyattack.view.TurnTransitionView;
+import com.navyattack.model.GameTimer;
 
 import java.util.List;
 
@@ -25,6 +27,7 @@ public class GameController {
     private CPU cpu = new CPU();
     private boolean isPlayer1Turn;
     private boolean hasAttackedThisTurn;
+    private GameTimer gameTimer;
 
     public GameController(Board player1Board, Board player2Board, GameView view, MenuController menuController) {
         this.view = view;
@@ -34,6 +37,10 @@ public class GameController {
         this.player1Board = player1Board;
         this.player2Board = player2Board;
         this.menuController = menuController;
+
+        this.gameTimer = new GameTimer();
+        view.bindTimer(gameTimer.timeStringProperty());
+        gameTimer.start();
 
         connectHandlers();
         initializeBoards();
@@ -197,17 +204,60 @@ public class GameController {
         }
     }
 
+    private void saveGameHistory(User winner, User loser, String winnerName, String loserName,
+                                 String timePlayed, long timePlayedMillis,
+                                 int winnerShipsSunk, int loserShipsSunk) {
+
+        List<User> players = new java.util.ArrayList<>();
+        if (winner != null) players.add(winner);
+        if (loser != null && !view.getGameMode().equals("PVC")) players.add(loser);
+
+        History history = new History(
+                players,
+                winnerName,
+                loserName,
+                timePlayed,
+                timePlayedMillis,
+                view.getGameMode(),
+                turnCounter,
+                winnerShipsSunk,
+                loserShipsSunk
+        );
+
+        // Agregar al historial de ambos jugadores
+        if (winner != null) {
+            winner.addHistory(history);
+        }
+
+        if (loser != null && !view.getGameMode().equals("PVC")) {
+            loser.addHistory(history);
+        }
+
+        // Notificar al MenuController para que guarde los datos
+        menuController.saveGameData();
+    }
+
+    private void pauseTimer() {
+        if (gameTimer != null) {
+            gameTimer.pause();
+        }
+    }
+
+    private void resumeTimer() {
+        if (gameTimer != null) {
+            gameTimer.start();
+        }
+    }
+
     private void showTurnTransition() {
         if (view.getGameMode().equals("PVC")) {
-            // Modo CPU: no necesita transición
             view.enableEnemyBoard();
             return;
         }
 
-        // Modo PVP: mostrar pantalla de transición
-        String nextPlayerName = isPlayer1Turn ? view.getPlayer1().getUsername() : view.getPlayer2().getUsername();
+        pauseTimer();
 
-        // ✓ Obtener Stage y Scene ANTES de crear la transición
+        String nextPlayerName = isPlayer1Turn ? view.getPlayer1().getUsername() : view.getPlayer2().getUsername();
         Stage stage = (Stage) view.getScene().getWindow();
         Scene gameScene = view.getScene();
 
@@ -216,10 +266,9 @@ public class GameController {
             return;
         }
 
-        // ✓ Pasar el Stage Y la Scene original
         TurnTransitionView transitionView = new TurnTransitionView(
                 stage,
-                gameScene,  // ← Pasar la escena del juego
+                gameScene,
                 nextPlayerName,
                 this::continueAfterTransition
         );
@@ -228,10 +277,9 @@ public class GameController {
     }
 
     private void continueAfterTransition() {
-        // Intercambiar displays de tableros
-        swapBoardDisplays();
+        resumeTimer();
 
-        // Habilitar tablero enemigo
+        swapBoardDisplays();
         view.enableEnemyBoard();
     }
 
@@ -319,25 +367,52 @@ public class GameController {
     }
 
     private void handleVictory() {
+        gameTimer.stop();
+        String finalTime = gameTimer.getFormattedTime();
+        long finalTimeMillis = gameTimer.getElapsedTimeMillis();
+
         User winner = isPlayer1Turn ? view.getPlayer1() : view.getPlayer2();
         User loser = isPlayer1Turn ? view.getPlayer2() : view.getPlayer1();
 
         String winnerName = winner != null ? winner.getUsername() : (isPlayer1Turn ? "Player 1" : "Player 2");
+        String loserName = loser != null ? loser.getUsername() : (view.getGameMode().equals("PVC") ? "CPU" : "Player 2");
+
+        // Calcular barcos hundidos
+        Board winnerBoard = isPlayer1Turn ? player1Board : player2Board;
+        Board loserBoard = isPlayer1Turn ? player2Board : player1Board;
+
+        int winnerShipsSunk = countSunkShips(loserBoard); // Barcos que hundió el ganador
+        int loserShipsSunk = countSunkShips(winnerBoard); // Barcos que hundió el perdedor
 
         view.showMessage("🎉 " + winnerName + " WINS! 🎉", false);
         view.disableEnemyBoard();
         view.enableEndTurnButton(false);
+
+        saveGameHistory(winner, loser, winnerName, loserName, finalTime, finalTimeMillis,
+                winnerShipsSunk, loserShipsSunk);
 
         // Navegar a pantalla de victoria después de 2 segundos
         new Thread(() -> {
             try {
                 Thread.sleep(2000);
                 javafx.application.Platform.runLater(() -> {
-                    menuController.navigateToVictory(winner, loser, view.getGameMode(), turnCounter);
+                    menuController.navigateToVictory(winner, loser, view.getGameMode(),
+                            turnCounter, finalTime, finalTimeMillis,
+                            winnerShipsSunk, loserShipsSunk);
                 });
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }).start();
+    }
+
+    private int countSunkShips(Board board) {
+        int sunkCount = 0;
+        for (Ship ship : board.getShips()) {
+            if (ship.isSunk()) {
+                sunkCount++;
+            }
+        }
+        return sunkCount;
     }
 }

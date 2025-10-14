@@ -37,6 +37,7 @@ public class GameView extends Application {
     private Label enemyPlayerNameLabel;
     private Label myBoardTitleLabel;
     private Label enemyBoardTitleLabel;
+    private Label timerLabel;
 
     // Botones
     private Button btnEndTurn;
@@ -82,6 +83,12 @@ public class GameView extends Application {
         panel.setAlignment(Pos.CENTER);
         panel.setPadding(new Insets(15));
         panel.setStyle("-fx-background-color: #34495e;");
+
+        // ✓ NUEVO: Label del cronómetro
+        timerLabel = new Label("⏱ 00:00");
+        timerLabel.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+        timerLabel.setTextFill(javafx.scene.paint.Color.web("#3498db"));
+
         currentTurnLabel = new Label("CURRENT TURN: PLAYER 1");
         currentTurnLabel.setFont(Font.font("Arial", FontWeight.BOLD, 24));
         currentTurnLabel.setTextFill(javafx.scene.paint.Color.YELLOW);
@@ -90,7 +97,7 @@ public class GameView extends Application {
         messageLabel.setFont(Font.font("Arial", FontWeight.NORMAL, 16));
         messageLabel.setTextFill(javafx.scene.paint.Color.WHITE);
 
-        panel.getChildren().addAll(currentTurnLabel, messageLabel);
+        panel.getChildren().addAll(timerLabel, currentTurnLabel, messageLabel);
         return panel;
     }
 
@@ -110,9 +117,9 @@ public class GameView extends Application {
         // Tablero enemigo (derecha) - ✓ SÍ interactivo
         VBox enemyBoardPanel = createBoardPanel(
                 "ENEMY WATERS",
-                player2 != null ? player2.getUsername() : "CPU"),
-                false,  // isMyBoard = false (esto hace que sea interactivo)
-                false   // showShips = false
+                player2 != null ? player2.getUsername() : "CPU",
+                false,
+                false
         );
 
         panel.getChildren().addAll(myBoardPanel, enemyBoardPanel);
@@ -253,6 +260,12 @@ public class GameView extends Application {
         if (enemyBoardTitleLabel != null) {
             enemyBoardTitleLabel.setText(title);
         }
+    }
+
+    public void bindTimer(javafx.beans.property.StringProperty timeProperty) {
+        timerLabel.textProperty().bind(
+                javafx.beans.binding.Bindings.concat("⏱ ", timeProperty)
+        );
     }
 
     // ===== GETTERS Y SETTERS =====

@@ -7,7 +7,7 @@ public class DataManager {
 
     private List<User> users;
     private List<User> loggedUsers;
-    
+
     public DataManager() {
         this.users = new ArrayList<>();
 	    this.loggedUsers = new ArrayList<>();
