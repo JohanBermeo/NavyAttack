@@ -18,20 +18,18 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.layout.BorderPane; 
 import javafx.application.Application; 
 
-import com.navyattack.model.User;
+import com.navyattack.model.History; 
 import com.navyattack.controller.MenuController;
-import com.navyattack.controller.NavigationController; 
+import com.navyattack.controller.NavigationController;
  
 public class MenuView extends Application { 
 
     private Scene scene; 
-    private List<User> loggedUsers; 
     private MenuController menuController;
     private NavigationController navigationController; 
 
     // Constructor que recibe la referencia del controlador 
-    public MenuView(MenuController menuController, NavigationController controller, List<User> loggedUsers) { 
-        this.loggedUsers = loggedUsers; 
+    public MenuView(MenuController menuController, NavigationController controller) { 
         this.menuController = menuController;
         this.navigationController = controller; 
     } 
@@ -50,7 +48,7 @@ public class MenuView extends Application {
 
         ImageView imageUser = UtilsMenuView.createImage("file:docs/Icons/png/user.png");  
 
-        Text leftText = new Text("Usuario: " + this.loggedUsers.get(0).getUsername()); 
+        Text leftText = new Text("Usuario: " + menuController.getLoggedUsers().get(0).getUsername()); 
         leftText.setFont(Font.font("Tahoma", FontWeight.BOLD, 20));  
 	    leftText.setStyle("-fx-fill: white;");
 	    leftText.setOnMouseEntered(e -> 
@@ -131,7 +129,7 @@ public class MenuView extends Application {
         historyBtn.setMaxWidth(125); 
         UtilsMenuView.styleButton(historyBtn, "black", "#333333", "white", "10px 0 10px 0"); 
         historyBtn.setOnAction(e -> { 
-            navigationController.navigateToHistory(this.loggedUsers.get(0));
+            navigationController.navigateToHistory(menuController.getLoggedUsers().get(0).getUsername(), menuController.getLoggedUsers().get(0).getHistory());
         }); 
         GridPane.setHalignment(historyBtn, HPos.CENTER); 	
         grid.add(historyBtn, 0, 3, 1, 1); 
@@ -140,7 +138,7 @@ public class MenuView extends Application {
         logoutBtn.setMaxWidth(125); 
         UtilsMenuView.styleButton(logoutBtn, "white", "#EDEDED", "black", "10px 0 10px 0"); 
         logoutBtn.setOnAction(e -> { 
-            navigationController.logoutUser(loggedUsers.get(0));
+            navigationController.logoutUser(menuController.getLoggedUsers().get(0).getUsername());
             navigationController.navigateToLogin();
         }); 
         GridPane.setHalignment(logoutBtn, HPos.CENTER); 
@@ -163,10 +161,10 @@ public class MenuView extends Application {
         mainPane.setStyle("-fx-background-color: linear-gradient(to right, #5872C9 0%, #5872C9 50%, #C95858 50%, #C95858 100%);");
         
         // Crear userContainer para el primer usuario
-        HBox leftUserContainer = createUserContainer(loggedUsers.get(0));
+        HBox leftUserContainer = createUserContainer(menuController.getLoggedUsers().get(0).getUsername(), menuController.getLoggedUsers().get(0).getHistory());
         
         // Crear userContainer para el segundo usuario
-        HBox rightUserContainer = createUserContainer(loggedUsers.get(1));
+        HBox rightUserContainer = createUserContainer(menuController.getLoggedUsers().get(1).getUsername(), menuController.getLoggedUsers().get(1).getHistory());
 
         // Posicionar userContainers en las esquinas superiores 
         BorderPane topPane = new BorderPane(); 
@@ -209,7 +207,7 @@ public class MenuView extends Application {
         stage.show(); 
     }
     
-    private HBox createUserContainer(User user) {
+    private HBox createUserContainer(String username, List<History> history) {
         HBox userContainer = new HBox(10);
         userContainer.setAlignment(Pos.CENTER_LEFT);
         userContainer.setStyle(
@@ -223,18 +221,18 @@ public class MenuView extends Application {
         
         ImageView userIcon = UtilsMenuView.createImage("file:docs/Icons/png/user.png");
         
-        Text username = new Text(user.getUsername());
-        username.setFont(Font.font("Tahoma", FontWeight.BOLD, 15));
+        Text usernames = new Text(username);
+        usernames.setFont(Font.font("Tahoma", FontWeight.BOLD, 15));
         
         Button historyBtn = new Button("History");
         UtilsMenuView.styleButton(historyBtn, "black", "#333333", "white", "5px 10px 5px 10px");
-        historyBtn.setOnAction(e -> navigationController.navigateToHistory(user));
+        historyBtn.setOnAction(e -> navigationController.navigateToHistory(username, history));
         
         Button logoutBtn = new Button("Logout");
         UtilsMenuView.styleButton(logoutBtn, "white", "#EDEDED", "black", "5px 10px 5px 10px");
-        logoutBtn.setOnAction(e -> navigationController.logoutUser(user));
+        logoutBtn.setOnAction(e -> navigationController.logoutUser(username));
         
-        userContainer.getChildren().addAll(userIcon, username, historyBtn, logoutBtn);
+        userContainer.getChildren().addAll(userIcon, usernames, historyBtn, logoutBtn);
         return userContainer;
     }
 

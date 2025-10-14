@@ -56,13 +56,13 @@ public class GameController {
 
     private void initializeBoards() {
         // ✓ Establecer nombres iniciales correctos
-        String player1Name = view.getPlayer1() != null ? view.getPlayer1().getUsername() : "Player 1";
+        String player1Name = view.getPlayer1() != null ? view.getPlayer1() : "Player 1";
         String player2Name;
 
         if (view.getGameMode().equals("PVC")) {
             player2Name = "CPU";
         } else {
-            player2Name = view.getPlayer2() != null ? view.getPlayer2().getUsername() : "Player 2";
+            player2Name = view.getPlayer2() != null ? view.getPlayer2() : "Player 2";
         }
 
         view.updateMyPlayerName(player1Name);
@@ -206,9 +206,11 @@ public class GameController {
         }
     }
 
-    private void saveGameHistory(User winner, User loser, String winnerName, String loserName,
-                                 String timePlayed, long timePlayedMillis,
+    private void saveGameHistory(String winnerName, String loserName, String timePlayed, long timePlayedMillis,
                                  int winnerShipsSunk, int loserShipsSunk) {
+
+        User winner = menuController.getUserByUsername(winnerName);
+        User loser = menuController.getUserByUsername(loserName);
 
         List<User> players = new java.util.ArrayList<>();
         if (winner != null) players.add(winner);
@@ -259,7 +261,7 @@ public class GameController {
 
         pauseTimer();
 
-        String nextPlayerName = isPlayer1Turn ? view.getPlayer1().getUsername() : view.getPlayer2().getUsername();
+        String nextPlayerName = isPlayer1Turn ? view.getPlayer1() : view.getPlayer2();
         Stage stage = (Stage) view.getScene().getWindow();
         Scene gameScene = view.getScene();
 
@@ -291,16 +293,16 @@ public class GameController {
         view.getEnemyBoard().clearAll();
 
         // Determinar qué jugador es el actual
-        User currentPlayer = isPlayer1Turn ? view.getPlayer1() : view.getPlayer2();
-        User enemyPlayer = isPlayer1Turn ? view.getPlayer2() : view.getPlayer1();
+        String currentPlayer = isPlayer1Turn ? view.getPlayer1() : view.getPlayer2();
+        String enemyPlayer = isPlayer1Turn ? view.getPlayer2() : view.getPlayer1();
 
         // ✓ Actualizar nombres de los jugadores
-        String myPlayerName = currentPlayer != null ? currentPlayer.getUsername() : (isPlayer1Turn ? "Player 1" : "Player 2");
-        String enemyPlayerName = enemyPlayer != null ? enemyPlayer.getUsername() : (isPlayer1Turn ? "Player 2" : "Player 1");
+        String myPlayerName = currentPlayer != null ? currentPlayer : (isPlayer1Turn ? "Player 1" : "Player 2");
+        String enemyPlayerName = enemyPlayer != null ? enemyPlayer : (isPlayer1Turn ? "Player 2" : "Player 1");
 
         // En modo PVC, el enemigo siempre es CPU
         if (view.getGameMode().equals("PVC")) {
-            myPlayerName = view.getPlayer1().getUsername();
+            myPlayerName = view.getPlayer1();
             enemyPlayerName = "CPU";
         }
 
@@ -338,8 +340,8 @@ public class GameController {
     }
 
     private void updateTurnDisplay() {
-        String currentPlayer = isPlayer1Turn ? view.getPlayer1().getUsername() :
-                (view.getPlayer2() != null ? view.getPlayer2().getUsername() : "Player 2");
+        String currentPlayer = isPlayer1Turn ? view.getPlayer1() :
+                (view.getPlayer2() != null ? view.getPlayer2() : "Player 2");
 
         view.updateCurrentTurn(currentPlayer);
         view.showMessage("Select a cell on the enemy board to attack!", false);
@@ -373,11 +375,11 @@ public class GameController {
         String finalTime = gameTimer.getFormattedTime();
         long finalTimeMillis = gameTimer.getElapsedTimeMillis();
 
-        User winner = isPlayer1Turn ? view.getPlayer1() : view.getPlayer2();
-        User loser = isPlayer1Turn ? view.getPlayer2() : view.getPlayer1();
+        String winner = isPlayer1Turn ? view.getPlayer1() : view.getPlayer2();
+        String loser = isPlayer1Turn ? view.getPlayer2() : view.getPlayer1();
 
-        String winnerName = winner != null ? winner.getUsername() : (isPlayer1Turn ? "Player 1" : "Player 2");
-        String loserName = loser != null ? loser.getUsername() : (view.getGameMode().equals("PVC") ? "CPU" : "Player 2");
+        String winnerName = winner != null ? winner : (isPlayer1Turn ? "Player 1" : "Player 2");
+        String loserName = loser != null ? loser : (view.getGameMode().equals("PVC") ? "CPU" : "Player 2");
 
         // Calcular barcos hundidos
         Board winnerBoard = isPlayer1Turn ? player1Board : player2Board;
@@ -390,7 +392,7 @@ public class GameController {
         view.disableEnemyBoard();
         view.enableEndTurnButton(false);
 
-        saveGameHistory(winner, loser, winnerName, loserName, finalTime, finalTimeMillis,
+        saveGameHistory(winnerName, loserName, finalTime, finalTimeMillis,
                 winnerShipsSunk, loserShipsSunk);
 
         // Navegar a pantalla de victoria después de 2 segundos

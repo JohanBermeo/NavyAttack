@@ -11,7 +11,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.application.Application;
 
-import com.navyattack.model.User;
 import com.navyattack.model.ShipType;
 import com.navyattack.controller.NavigationController;
 import com.navyattack.view.components.BoardGridComponent;
@@ -27,25 +26,25 @@ public class DeploymentView extends Application {
     private NavigationController menuController;
 
     // Botones de deployment
+    private Button btnBack;
+    private Button btnRandom;
+    private Button btnStartGame;
+    private Button btnPlaceShip;
+    private Button btnRotateShip;
     private Button btnDeployCarrier;
     private Button btnDeployCruiser;
     private Button btnDeployDestroyer;
     private Button btnDeploySubmarine;
-    private Button btnRotateShip;
-    private Button btnPlaceShip;
-    private Button btnStartGame;
-    private Button btnBack;
-    private Button btnRandom;
 
     // Labels de contadores
     private Label[] shipCountLabels;
 
     // Label de mensajes
-    private Label messageLabel;
     private String gameMode;
-    private User currentPlayer;
+    private Label messageLabel;
+    private String currentPlayer;
 
-    public DeploymentView(NavigationController controller, String gameMode, User currentPlayer) {
+    public DeploymentView(NavigationController controller, String gameMode, String currentPlayer) {
         this.menuController = controller;
         this.gameMode = gameMode;
         this.currentPlayer = currentPlayer;
@@ -77,7 +76,7 @@ public class DeploymentView extends Application {
         panel.setAlignment(Pos.CENTER);
 
         // Mostrar nombre del jugador
-        String playerName = currentPlayer != null ? currentPlayer.getUsername() : "Player";
+        String playerName = currentPlayer != null ? currentPlayer : "Player";
         Label playerLabel = new Label(playerName.toUpperCase() + "'S FLEET");
         playerLabel.setFont(Font.font("Arial", FontWeight.BOLD, 18));
         playerLabel.setTextFill(javafx.scene.paint.Color.YELLOW);
@@ -465,7 +464,7 @@ public class DeploymentView extends Application {
         return gameMode;
     }
 
-    public User getCurrentPlayer() {
+    public String getCurrentPlayer() {
         return currentPlayer;
     }
 }

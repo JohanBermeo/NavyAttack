@@ -76,12 +76,12 @@ public class NavigationController {
 
       clearViewReferences();
 
-      this.menuView = new MenuView(menuController, this, menuController.getLoggedUsers());
+      this.menuView = new MenuView(menuController, this);
       menuView.start(currentStage);
    }
 
-   public void logoutUser(User user) {
-      menuController.logoutUser(user);
+   public void logoutUser(String username) {
+      menuController.logoutUser(username);
 
       if (menuController.hasNoUsers()) {
          navigateToLogin();
@@ -119,7 +119,7 @@ public class NavigationController {
       signUpView.start(currentStage);
    }
 
-   public void navigateToHistory(User user) {
+   public void navigateToHistory(String username, java.util.List<com.navyattack.model.History> history) {
       Stage currentStage;
       if (menuView != null && menuView.getScene() != null) {
          currentStage = (Stage) menuView.getScene().getWindow();
@@ -129,7 +129,7 @@ public class NavigationController {
       }
 
       clearViewReferences();
-      this.historyView = new HistoryView(this, user);
+      this.historyView = new HistoryView(this, username, history);
       historyView.start(currentStage);
    }
 
@@ -182,7 +182,7 @@ public class NavigationController {
       Board playerBoard = new Board();
       User currentPlayer = menuController.getLoggedUsers().isEmpty() ? null : menuController.getLoggedUsers().get(0);
 
-      this.deploymentView = new DeploymentView(this, gameMode, currentPlayer);
+      this.deploymentView = new DeploymentView(this, gameMode, currentPlayer.getUsername());
       deploymentView.start(currentStage);
 
       new DeploymentController(playerBoard, deploymentView, this);
@@ -203,7 +203,7 @@ public class NavigationController {
       User nextPlayer = menuController.getLoggedUsers().size() > 1 ?
                menuController.getLoggedUsers().get(1) : null;
 
-      this.transitionView = new TransitionView(this, nextPlayer, gameMode);
+      this.transitionView = new TransitionView(this, nextPlayer.getUsername(), gameMode);
       transitionView.start(currentStage);
    }
 
@@ -223,7 +223,7 @@ public class NavigationController {
       User player2 = menuController.getLoggedUsers().size() > 1 ?
                menuController.getLoggedUsers().get(1) : null;
 
-      this.deploymentView = new DeploymentView(this, gameMode, player2);
+      this.deploymentView = new DeploymentView(this, gameMode, player2.getUsername());
       deploymentView.start(currentStage);
 
       new DeploymentController(player2Board, deploymentView, this);
@@ -241,15 +241,15 @@ public class NavigationController {
 
       clearViewReferences();
 
-      User player1 = menuController.getLoggedUsers().isEmpty() ? null : menuController.getLoggedUsers().get(0);
-      User player2 = null;
+      String player1 = menuController.getLoggedUsers().isEmpty() ? null : menuController.getLoggedUsers().get(0).getUsername();
+      String player2 = null;
 
       if (gameMode.equals("PVC")) {
          player2Board = new Board();
          Board.placeShipsRandomly(player2Board);
          player2 = null;
       } else {
-         player2 = menuController.getLoggedUsers().get(1);
+         player2 = menuController.getLoggedUsers().get(1).getUsername();
       }
 
       this.gameView = new GameView(this, player1, player2, gameMode);
@@ -258,7 +258,7 @@ public class NavigationController {
       new GameController(player1Board, player2Board, gameView, menuController, this);
    }
 
-   public void navigateToVictory(User winner, User loser, String gameMode, int totalTurns,
+   public void navigateToVictory(String winner, String loser, String gameMode, int totalTurns,
                                  String timePlayed, long timePlayedMillis,
                                  int winnerShipsSunk, int loserShipsSunk) {
       Stage currentStage = null;

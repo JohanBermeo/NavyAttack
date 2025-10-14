@@ -11,7 +11,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.application.Application;
 
-import com.navyattack.model.User;
 import com.navyattack.controller.NavigationController;
 
 /**
@@ -22,11 +21,11 @@ import com.navyattack.controller.NavigationController;
 public class TransitionView extends Application {
 
     private Scene scene;
-    private User nextPlayer;
     private String gameMode;
+    private String nextPlayer;
     private NavigationController menuController;
 
-    public TransitionView(NavigationController controller, User nextPlayer, String gameMode) {
+    public TransitionView(NavigationController controller, String nextPlayer, String gameMode) {
         this.menuController = controller;
         this.nextPlayer = nextPlayer;
         this.gameMode = gameMode;
@@ -79,7 +78,7 @@ public class TransitionView extends Application {
         instruction1.setFont(Font.font("Arial", FontWeight.BOLD, 18));
         instruction1.setTextFill(javafx.scene.paint.Color.WHITE);
 
-        Label instruction2 = new Label("Now it's " + nextPlayer.getUsername() + "'s turn");
+        Label instruction2 = new Label("Now it's " + nextPlayer + "'s turn");
         instruction2.setFont(Font.font("Arial", FontWeight.BOLD, 22));
         instruction2.setTextFill(javafx.scene.paint.Color.YELLOW);
 

@@ -13,7 +13,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.application.Application;
 
-import com.navyattack.model.User;
 import com.navyattack.controller.NavigationController;
 
 /**
@@ -22,9 +21,9 @@ import com.navyattack.controller.NavigationController;
  */
 public class VictoryView extends Application {
 
-    private User loser;
+    private String loser;
     private Scene scene;
-    private User winner;
+    private String winner;
     private int totalTurns;
     private String gameMode;
     private String timePlayed;
@@ -32,7 +31,7 @@ public class VictoryView extends Application {
     private int winnerShipsSunk;
     private NavigationController menuController;
 
-    public VictoryView(NavigationController controller, User winner, User loser, String gameMode,
+    public VictoryView(NavigationController controller, String winner, String loser, String gameMode,
                        int totalTurns, String timePlayed, long timePlayedMillis,
                        int winnerShipsSunk, int loserShipsSunk) {
         this.menuController = controller;
@@ -62,7 +61,7 @@ public class VictoryView extends Application {
         title.setTextFill(javafx.scene.paint.Color.web("#f39c12"));
 
         // Nombre del ganador
-        String winnerName = winner != null ? winner.getUsername() : "Player";
+        String winnerName = winner != null ? winner : "Player";
         Label winnerLabel = new Label(winnerName + " WINS!");
         winnerLabel.setFont(Font.font("Arial", FontWeight.BOLD, 32));
         winnerLabel.setTextFill(javafx.scene.paint.Color.WHITE);
@@ -126,8 +125,8 @@ public class VictoryView extends Application {
         container.setAlignment(Pos.CENTER);
         container.setPadding(new Insets(10, 0, 10, 0));
 
-        String winnerName = winner != null ? winner.getUsername() : "Player";
-        String loserName = loser != null ? loser.getUsername() : (gameMode.equals("PVC") ? "CPU" : "Player 2");
+        String winnerName = winner != null ? winner : "Player";
+        String loserName = loser != null ? loser : (gameMode.equals("PVC") ? "CPU" : "Player 2");
 
         // Estadísticas del ganador
         VBox winnerStats = createPlayerStatsCard(winnerName, winnerShipsSunk, loserShipsSunk, true);

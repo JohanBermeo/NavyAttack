@@ -7,17 +7,20 @@ import java.util.List;
  */
 public class UserStatistics {
 
-    private final User user;
-    private int totalGames;
-    private int victories;
+    private final String username;
+    private final List<History> history;
+
     private int defeats;
+    private int victories;
+    private int totalGames;
+    private int totalTurns;
     private int totalShipsSunk;
     private int totalShipsLost;
-    private long totalPlayTime; // en milisegundos
-    private int totalTurns;
+    private long totalPlayTime; 
 
-    public UserStatistics(User user) {
-        this.user = user;
+    public UserStatistics(String username, List<History> history) {
+        this.history = history;
+        this.username = username;
         calculateStatistics();
     }
 
@@ -25,8 +28,6 @@ public class UserStatistics {
      * Calcula todas las estadísticas del usuario basándose en su historial.
      */
     private void calculateStatistics() {
-        List<History> history = user.getHistory();
-
         if (history == null || history.isEmpty()) {
             return;
         }
@@ -41,7 +42,7 @@ public class UserStatistics {
 
         for (History game : history) {
             // Contar victorias y derrotas
-            if (game.didPlayerWin(user.getUsername())) {
+            if (game.didPlayerWin(username)) {
                 victories++;
                 totalShipsSunk += game.getWinnerShipsSunk();
                 totalShipsLost += game.getLoserShipsSunk();
@@ -137,8 +138,8 @@ public class UserStatistics {
         return totalTurns;
     }
 
-    public User getUser() {
-        return user;
+    public String getUsername() {
+        return username;
     }
 
     /**

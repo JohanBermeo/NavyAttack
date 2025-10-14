@@ -119,7 +119,8 @@ public class MenuController {
         return false;
     }
 
-    public void logoutUser(User user) {
+    public void logoutUser(String username) {
+        User user = dataManager.findUser(username);
         dataManager.deleteLoggedUser(user);
     }
 
@@ -135,5 +136,9 @@ public class MenuController {
 
     public boolean hasNoUsers() {
         return dataManager.isLoggedEmpty();
+    }
+
+    public User getUserByUsername(String username) {
+        return dataManager.findUser(username);
     }
 }

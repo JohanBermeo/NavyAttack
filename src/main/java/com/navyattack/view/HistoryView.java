@@ -1,5 +1,6 @@
 package com.navyattack.view;
 
+import java.util.List;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.geometry.Pos;
@@ -8,7 +9,6 @@ import javafx.scene.layout.*;
 import javafx.geometry.Insets;
 import javafx.application.Application;
 
-import com.navyattack.model.User;
 import com.navyattack.model.History;
 import com.navyattack.model.UserStatistics;
 import com.navyattack.controller.NavigationController;
@@ -16,13 +16,15 @@ import com.navyattack.controller.NavigationController;
 public class HistoryView extends Application {
 
     private Scene scene;
-    private User currentUser;
+    private String username;
+    private List<History> history;
     private NavigationController controller;
     private ListView<History> historyListView;
 
-    public HistoryView(NavigationController controller, User user) {
+    public HistoryView(NavigationController controller, String username, List<History> history) {
+        this.history = history;
+        this.username = username;
         this.controller = controller;
-        this.currentUser = user;
     }
 
     @Override
@@ -53,7 +55,7 @@ public class HistoryView extends Application {
         topPanel.setAlignment(Pos.CENTER);
         topPanel.setPadding(new Insets(0, 0, 15, 0));
 
-        Label titleLabel = new Label("History - " + (currentUser != null ? currentUser.getUsername() : "N/A"));
+        Label titleLabel = new Label("History - " + username);
         titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;");
 
         // ✓ NUEVO: Panel de estadísticas generales
@@ -75,11 +77,7 @@ public class HistoryView extends Application {
                         "-fx-border-radius: 10;"
         );
 
-        if (currentUser == null) {
-            return panel;
-        }
-
-        UserStatistics stats = new UserStatistics(currentUser);
+        UserStatistics stats = new UserStatistics(username, history);
 
         // Juegos totales
         VBox gamesBox = createStatBox("🎮", "Games", String.valueOf(stats.getTotalGames()));
@@ -167,10 +165,10 @@ public class HistoryView extends Application {
     }
 
     private void loadHistories() {
-        if (currentUser != null && currentUser.getHistory() != null) {
+        if (history != null) {
             historyListView.getItems().clear();
             // Mostrar las partidas más recientes primero
-            java.util.List<History> reversed = new java.util.ArrayList<>(currentUser.getHistory());
+            java.util.List<History> reversed = new java.util.ArrayList<>(history);
             java.util.Collections.reverse(reversed);
             historyListView.getItems().addAll(reversed);
         }
@@ -213,7 +211,7 @@ public class HistoryView extends Application {
             card.setPadding(new Insets(15));
 
             // Determinar si el jugador principal ganó
-            boolean playerWon = history.didPlayerWin(currentUser.getUsername());
+            boolean playerWon = history.didPlayerWin(username);
             String backgroundColor = playerWon ? "#e8f5e9" : "#ffebee";
             String borderColor = playerWon ? "#4caf50" : "#f44336";
 
@@ -269,7 +267,7 @@ public class HistoryView extends Application {
             Label playerIcon = new Label(playerWon ? "👑" : "💀");
             playerIcon.setStyle("-fx-font-size: 20px;");
 
-            Label playerName = new Label(currentUser.getUsername());
+            Label playerName = new Label(username);
             playerName.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: black;");
 
             playerBox.getChildren().addAll(playerIcon, playerName);
@@ -285,7 +283,7 @@ public class HistoryView extends Application {
             Label opponentIcon = new Label(playerWon ? "💀" : "👑");
             opponentIcon.setStyle("-fx-font-size: 20px;");
 
-            Label opponentName = new Label(history.getLoser().equals(currentUser.getUsername()) ?
+            Label opponentName = new Label(history.getLoser().equals(username) ?
                     history.getWinner() : history.getLoser());
             opponentName.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: black;");
 
@@ -303,7 +301,7 @@ public class HistoryView extends Application {
             grid.setPadding(new Insets(10, 0, 0, 0));
 
             // Determinar si el jugador ganó para mostrar stats correctas
-            boolean playerWon = history.didPlayerWin(currentUser.getUsername());
+            boolean playerWon = history.didPlayerWin(username);
             int playerShipsSunk = playerWon ? history.getWinnerShipsSunk() : history.getLoserShipsSunk();
             int opponentShipsSunk = playerWon ? history.getLoserShipsSunk() : history.getWinnerShipsSunk();
 

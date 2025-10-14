@@ -3,15 +3,14 @@ package com.navyattack.view;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.geometry.Pos;
-import javafx.geometry.Insets;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
+import javafx.geometry.Insets;
+import javafx.scene.control.Label;
+import javafx.scene.control.Button;
 import javafx.scene.text.FontWeight;
 import javafx.application.Application;
 
-import com.navyattack.model.User;
 import com.navyattack.controller.NavigationController;
 import com.navyattack.view.components.BoardGridComponent;
 
@@ -44,11 +43,11 @@ public class GameView extends Application {
     private Button btnSurrender;
 
     // Información del juego
-    private User player1;
-    private User player2;
+    private String player1;
+    private String player2;
     private String gameMode;
 
-    public GameView(NavigationController controller, User player1, User player2, String gameMode) {
+    public GameView(NavigationController controller, String player1, String player2, String gameMode) {
         this.menuController = controller;
         this.player1 = player1;
         this.player2 = player2;
@@ -109,7 +108,7 @@ public class GameView extends Application {
         // Tablero propio (izquierda) - NO interactivo
 		VBox myBoardPanel = createBoardPanel(
             "YOUR FLEET",
-            player1.getUsername(),
+            player1,
             true,   // isMyBoard = true
             true    // showShips = true (no se usa actualmente)
         );
@@ -117,7 +116,7 @@ public class GameView extends Application {
         // Tablero enemigo (derecha) - ✓ SÍ interactivo
         VBox enemyBoardPanel = createBoardPanel(
                 "ENEMY WATERS",
-                player2 != null ? player2.getUsername() : "CPU",
+                player2 != null ? player2 : "CPU",
                 false,
                 false
         );
@@ -322,11 +321,11 @@ public class GameView extends Application {
         enemyBoard.enableAllCells();
     }
 
-    public User getPlayer1() {
+    public String getPlayer1() {
         return player1;
     }
 
-    public User getPlayer2() {
+    public String getPlayer2() {
         return player2;
     }
 
