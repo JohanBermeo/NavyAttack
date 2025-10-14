@@ -426,4 +426,45 @@ public class Board {
         availableShips.clear();
         availableShips.putAll(initializeAvailableShips());
     }
+
+    public static void placeShipsRandomly(Board board) {
+        java.util.Random random = new java.util.Random();
+
+        for (ShipType type : ShipType.values()) {
+            int quantity = board.getRemainingShips(type);
+
+            for (int i = 0; i < quantity; i++) {
+                boolean placed = false;
+                int attempts = 0;
+
+                while (!placed && attempts < 100) {
+                    int row = random.nextInt(Board.BOARD_SIZE);
+                    int col = random.nextInt(Board.BOARD_SIZE);
+
+                    Ship ship = new Ship(type);
+
+                    if (random.nextBoolean()) {
+                        ship.rotate();
+                    }
+
+                    if (board.canPlaceShip(ship, row, col)) {
+                        board.placeShip(ship, row, col);
+                        placed = true;
+
+                        if (attempts > 0) {
+                            System.out.println("  " + type + " colocado en intento " + (attempts + 1));
+                        }
+                    }
+
+                    attempts++;
+                }
+
+                if (!placed) {
+                    System.err.println("WARNING: No se pudo colocar " + type + " después de 100 intentos");
+                    System.err.println("Estado del tablero:");
+                    System.err.println(board.toString());
+                }
+            }
+        }
+    }
 }
