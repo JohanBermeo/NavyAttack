@@ -12,20 +12,48 @@ import com.navyattack.model.History;
 import com.navyattack.model.UserStatistics;
 import com.navyattack.controller.NavigationController;
 
+/**
+ * Vista que muestra el historial de partidas jugadas por un usuario.
+ * Incluye estadísticas generales, partidas pasadas y opción para volver al menú principal.
+ * 
+ * @author Juan Manuel Otálora Hernández - Johan Stevan Bermeo Buitrago
+ * @version 1.0
+ */
 public class HistoryView implements IView {
 
+    /** Escena principal de la vista */
     private Scene scene;
+
+    /** Nombre del usuario actual */
     private String username;
+
+    /** Lista de partidas jugadas */
     private List<History> history;
+
+    /** Controlador de navegación entre vistas */
     private NavigationController controller;
+
+    /** Lista visual que muestra las partidas del historial */
     private ListView<History> historyListView;
 
+    /**
+     * Constructor de la vista del historial.
+     * 
+     * @param controller Controlador de navegación entre vistas
+     * @param username   Nombre del usuario actual
+     * @param history    Lista de partidas jugadas por el usuario
+     */
     public HistoryView(NavigationController controller, String username, List<History> history) {
         this.history = history;
         this.username = username;
         this.controller = controller;
     }
 
+    /**
+     * Inicializa y muestra la interfaz del historial.
+     * 
+     * @param primaryStage Ventana principal de la aplicación
+     */
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("NavyAttack - History");
@@ -49,6 +77,11 @@ public class HistoryView implements IView {
         loadHistories();
     }
 
+    /**
+     * Crea el panel superior con el título y estadísticas del usuario.
+     * 
+     * @return Panel superior con información del usuario
+     */
     private VBox createTopPanel() {
         VBox topPanel = new VBox(15);
         topPanel.setAlignment(Pos.CENTER);
@@ -63,16 +96,21 @@ public class HistoryView implements IView {
         return topPanel;
     }
 
+    /**
+     * Crea el panel con las estadísticas del usuario.
+     * 
+     * @return Panel con estadísticas (juegos, victorias, derrotas, etc.)
+     */
     private HBox createStatsPanel() {
         HBox panel = new HBox(20);
         panel.setAlignment(Pos.CENTER);
         panel.setPadding(new Insets(15));
         panel.setStyle(
                 "-fx-background-color: rgba(255, 255, 255, 0.2);" +
-                        "-fx-background-radius: 10;" +
-                        "-fx-border-color: white;" +
-                        "-fx-border-width: 2;" +
-                        "-fx-border-radius: 10;"
+                "-fx-background-radius: 10;" +
+                "-fx-border-color: white;" +
+                "-fx-border-width: 2;" +
+                "-fx-border-radius: 10;"
         );
 
         UserStatistics stats = new UserStatistics(username, history);
@@ -88,6 +126,14 @@ public class HistoryView implements IView {
         return panel;
     }
 
+    /**
+     * Crea una caja individual de estadística.
+     * 
+     * @param icon  Icono representativo
+     * @param label Etiqueta de la estadística
+     * @param value Valor numérico o textual
+     * @return Caja de estadística formateada
+     */
     private VBox createStatBox(String icon, String label, String value) {
         VBox box = new VBox(5);
         box.setAlignment(Pos.CENTER);
@@ -105,6 +151,11 @@ public class HistoryView implements IView {
         return box;
     }
 
+    /**
+     * Crea el panel central que muestra el historial de partidas.
+     * 
+     * @return Panel central con lista de partidas
+     */
     private VBox createCenterPanel() {
         VBox centerPanel = new VBox();
         centerPanel.setAlignment(Pos.TOP_CENTER);
@@ -132,6 +183,11 @@ public class HistoryView implements IView {
         return centerPanel;
     }
 
+    /**
+     * Crea la vista que se muestra cuando el historial está vacío.
+     * 
+     * @return Panel con mensaje informativo
+     */
     private VBox createEmptyHistoryView() {
         VBox emptyView = new VBox();
         emptyView.setAlignment(Pos.CENTER);
@@ -151,6 +207,9 @@ public class HistoryView implements IView {
         return emptyView;
     }
 
+    /**
+     * Carga las partidas del historial en la lista visual.
+     */
     private void loadHistories() {
         if (history != null) {
             historyListView.getItems().clear();
@@ -160,6 +219,11 @@ public class HistoryView implements IView {
         }
     }
 
+    /**
+     * Crea el panel inferior con el botón de retorno al menú principal.
+     * 
+     * @return Panel inferior con botón "Return"
+     */
     private HBox createBottomPanel() {
         HBox bottomPanel = new HBox();
         bottomPanel.setAlignment(Pos.CENTER);
@@ -168,16 +232,23 @@ public class HistoryView implements IView {
         Button backButton = new Button("Return");
         backButton.setPrefWidth(150);
         UtilsMenuView.styleButton(backButton, "black", "#333333", "white", "5px 0 5px 0");
-        backButton.setOnAction(e -> {
-            controller.navigateToView("menu");
-        });
+        backButton.setOnAction(e -> controller.navigateToView("menu"));
 
         bottomPanel.getChildren().add(backButton);
         return bottomPanel;
     }
 
+    /**
+     * Clase interna que define el formato visual de cada partida del historial.
+     */
     private class HistoryCardCell extends ListCell<History> {
 
+        /**
+         * Actualiza el contenido visual de cada elemento de la lista.
+         * 
+         * @param history Objeto de tipo History a representar
+         * @param empty   Indica si la celda está vacía
+         */
         @Override
         protected void updateItem(History history, boolean empty) {
             super.updateItem(history, empty);
@@ -192,6 +263,12 @@ public class HistoryView implements IView {
             }
         }
 
+        /**
+         * Crea la tarjeta visual que representa una partida.
+         * 
+         * @param history Objeto History con los datos de la partida
+         * @return Tarjeta con la información del resultado y estadísticas
+         */
         private VBox createHistoryCard(History history) {
             VBox card = new VBox(10);
             card.setPadding(new Insets(15));
@@ -202,10 +279,10 @@ public class HistoryView implements IView {
 
             card.setStyle(String.format(
                     "-fx-background-color: %s;" +
-                            "-fx-border-color: %s;" +
-                            "-fx-border-width: 3;" +
-                            "-fx-border-radius: 10;" +
-                            "-fx-background-radius: 10;",
+                    "-fx-border-color: %s;" +
+                    "-fx-border-width: 3;" +
+                    "-fx-border-radius: 10;" +
+                    "-fx-background-radius: 10;",
                     backgroundColor, borderColor
             ));
 
@@ -216,8 +293,8 @@ public class HistoryView implements IView {
             Label resultLabel = new Label(playerWon ? "✅ VICTORY" : "❌ DEFEAT");
             resultLabel.setStyle(String.format(
                     "-fx-font-weight: bold;" +
-                            "-fx-font-size: 16px;" +
-                            "-fx-text-fill: %s;",
+                    "-fx-font-size: 16px;" +
+                    "-fx-text-fill: %s;",
                     playerWon ? "#2e7d32" : "#c62828"
             ));
 
@@ -236,6 +313,13 @@ public class HistoryView implements IView {
             return card;
         }
 
+        /**
+         * Crea la sección que muestra los jugadores de la partida.
+         * 
+         * @param history   Objeto History con los datos del encuentro
+         * @param playerWon Indica si el usuario ganó
+         * @return Panel con nombres e iconos de los jugadores
+         */
         private HBox createPlayersSection(History history, boolean playerWon) {
             HBox section = new HBox(20);
             section.setAlignment(Pos.CENTER);
@@ -271,6 +355,12 @@ public class HistoryView implements IView {
             return section;
         }
 
+        /**
+         * Crea la cuadrícula que muestra las estadísticas de la partida.
+         * 
+         * @param history Objeto History con los datos de la partida
+         * @return Cuadrícula con estadísticas detalladas
+         */
         private GridPane createMatchStatsGrid(History history) {
             GridPane grid = new GridPane();
             grid.setAlignment(Pos.CENTER);
@@ -291,6 +381,15 @@ public class HistoryView implements IView {
             return grid;
         }
 
+        /**
+         * Añade una estadística individual al grid.
+         * 
+         * @param grid  Cuadrícula destino
+         * @param col   Columna
+         * @param row   Fila
+         * @param icon  Icono representativo
+         * @param value Valor textual
+         */
         private void addStatToGrid(GridPane grid, int col, int row, String icon, String value) {
             HBox box = new HBox(5);
             box.setAlignment(Pos.CENTER);
@@ -306,6 +405,11 @@ public class HistoryView implements IView {
         }
     }
 
+    /**
+     * Retorna la escena principal de la vista.
+     * 
+     * @return Objeto Scene de la vista
+     */
     public Scene getScene() {
         return scene;
     }

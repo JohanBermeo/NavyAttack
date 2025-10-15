@@ -21,19 +21,43 @@ import javafx.application.Application;
 import com.navyattack.model.History; 
 import com.navyattack.controller.MenuController;
 import com.navyattack.controller.NavigationController;
- 
+
+/**
+ * Vista principal del menú del juego NavyAttack.
+ * Gestiona la interfaz de usuario para uno o dos jugadores, 
+ * mostrando opciones como jugar, ver historial o cerrar sesión.
+ * 
+ * @author Juan Manuel Otálora Hernández - Johan Stevan Bermeo Buitrago
+ * @version 1.0
+ */
 public class MenuView extends Application implements IView { 
 
+    /** Escena principal del menú. */
     private Scene scene; 
+
+    /** Controlador encargado de la lógica del menú y usuarios. */
     private MenuController menuController;
+
+    /** Controlador encargado de la navegación entre vistas. */
     private NavigationController navigationController; 
 
-    // Constructor que recibe la referencia del controlador 
+    /**
+     * Constructor de la clase MenuView.
+     *
+     * @param menuController controlador del menú principal.
+     * @param controller controlador de navegación entre vistas.
+     */
     public MenuView(MenuController menuController, NavigationController controller) { 
         this.menuController = menuController;
         this.navigationController = controller; 
     } 
 
+    /**
+     * Inicia la vista del menú.
+     * Muestra una interfaz distinta dependiendo de si hay uno o dos usuarios conectados.
+     *
+     * @param stage escenario principal donde se muestra la vista.
+     */
     @Override 
     public void start(Stage stage) { 
         if (menuController.hasSingleUser()) {
@@ -43,6 +67,11 @@ public class MenuView extends Application implements IView {
         }
     }
     
+    /**
+     * Crea la interfaz del menú cuando solo hay un usuario conectado.
+     *
+     * @param stage escenario principal.
+     */
     private void createSingleUserInterface(Stage stage) {
         BorderPane mainPane = new BorderPane();          
 
@@ -50,51 +79,36 @@ public class MenuView extends Application implements IView {
 
         Text leftText = new Text("Usuario: " + menuController.getLoggedUsers().get(0).getUsername()); 
         leftText.setFont(Font.font("Tahoma", FontWeight.BOLD, 20));  
-	    leftText.setStyle("-fx-fill: white;");
-	    leftText.setOnMouseEntered(e -> 
-            leftText.setStyle("-fx-fill: #EDEDED;")
-	    );
-        leftText.setOnMouseExited(e -> 
-            leftText.setStyle("-fx-fill: white;")
-        );
+        leftText.setStyle("-fx-fill: white;");
+        leftText.setOnMouseEntered(e -> leftText.setStyle("-fx-fill: #EDEDED;"));
+        leftText.setOnMouseExited(e -> leftText.setStyle("-fx-fill: white;"));
 
         HBox leftContainer = new HBox(5); 
         leftContainer.setAlignment(Pos.CENTER_LEFT); 
         leftContainer.getChildren().addAll(imageUser, leftText); 
 
-
         ImageView imageAdd = UtilsMenuView.createImage("file:docs/Icons/png/001-botn-agregar.png");
         imageAdd.setStyle("-fx-cursor: hand;");
-        imageAdd.setOnMouseClicked(event -> {
-            navigationController.navigateToView("login");
-        });
+        imageAdd.setOnMouseClicked(event -> navigationController.navigateToView("login"));
 
         Text rightText = new Text("Add new user"); 
-	    rightText.setStyle("-fx-fill: white;");
-        rightText.setOnMouseEntered(e -> 
-            rightText.setStyle(
-                "-fx-underline: true;" +
-		        "-fx-fill: #EDEDED;" +
-                "-fx-cursor: hand;"
-            )
-        );
-        rightText.setOnMouseExited(e -> 
-            rightText.setStyle(
-                "-fx-underline: false;" + 
-		        "-fx-fill: white;"
-            )
-        );
-        rightText.setOnMouseClicked(event -> {
-            navigationController.navigateToView("login");
-        });
+        rightText.setStyle("-fx-fill: white;");
+        rightText.setOnMouseEntered(e -> rightText.setStyle(
+            "-fx-underline: true;" +
+            "-fx-fill: #EDEDED;" +
+            "-fx-cursor: hand;"
+        ));
+        rightText.setOnMouseExited(e -> rightText.setStyle(
+            "-fx-underline: false;" +
+            "-fx-fill: white;"
+        ));
+        rightText.setOnMouseClicked(event -> navigationController.navigateToView("login"));
         rightText.setFont(Font.font("Tahoma", FontWeight.BOLD, 20)); 
-        rightText.setFill(javafx.scene.paint.Color.BLACK); 
 
         HBox rightContainer = new HBox(5); 
         rightContainer.setAlignment(Pos.CENTER_LEFT); 
         rightContainer.getChildren().addAll(imageAdd, rightText);  
 
-        // Posicionar textos en las esquinas superiores 
         BorderPane topPane = new BorderPane(); 
         topPane.setLeft(leftContainer); 
         topPane.setRight(rightContainer); 
@@ -119,18 +133,17 @@ public class MenuView extends Application implements IView {
         Button playBtn = new Button("Play"); 
         playBtn.setMaxWidth(125); 
         UtilsMenuView.styleButton(playBtn, "black", "#333333", "white", "10px 0 10px 0"); 
-        playBtn.setOnAction(e -> { 
-            navigationController.navigateToView("play");
-        }); 
-	    GridPane.setHalignment(playBtn, HPos.CENTER); 
+        playBtn.setOnAction(e -> navigationController.navigateToView("play"));
+        GridPane.setHalignment(playBtn, HPos.CENTER); 
         grid.add(playBtn, 0, 2, 1, 1); 
 
         Button historyBtn = new Button("History"); 
         historyBtn.setMaxWidth(125); 
         UtilsMenuView.styleButton(historyBtn, "black", "#333333", "white", "10px 0 10px 0"); 
-        historyBtn.setOnAction(e -> { 
-            navigationController.navigateToHistory(menuController.getLoggedUsers().get(0).getUsername(), menuController.getLoggedUsers().get(0).getHistory());
-        }); 
+        historyBtn.setOnAction(e -> navigationController.navigateToHistory(
+            menuController.getLoggedUsers().get(0).getUsername(), 
+            menuController.getLoggedUsers().get(0).getHistory()
+        )); 
         GridPane.setHalignment(historyBtn, HPos.CENTER); 	
         grid.add(historyBtn, 0, 3, 1, 1); 
 
@@ -145,7 +158,6 @@ public class MenuView extends Application implements IView {
         grid.add(logoutBtn, 0, 4, 1, 1); 
         mainPane.setCenter(grid); 
 
-        // Crear y mostrar la escena 
         Scene scene = new Scene(mainPane, 1080, 720); 
         scene.getRoot().setStyle("-fx-background-color: #5872C9;"); 
         this.scene = scene; 
@@ -154,19 +166,25 @@ public class MenuView extends Application implements IView {
         stage.show(); 
     }
     
+    /**
+     * Crea la interfaz del menú cuando hay dos usuarios conectados.
+     *
+     * @param stage escenario principal.
+     */
     private void createMultiUserInterface(Stage stage) {
         BorderPane mainPane = new BorderPane();
-        
-        // Crear fondo dividido con dos colores usando CSS linear gradient
         mainPane.setStyle("-fx-background-color: linear-gradient(to right, #5872C9 0%, #5872C9 50%, #C95858 50%, #C95858 100%);");
         
-        // Crear userContainer para el primer usuario
-        HBox leftUserContainer = createUserContainer(menuController.getLoggedUsers().get(0).getUsername(), menuController.getLoggedUsers().get(0).getHistory());
+        HBox leftUserContainer = createUserContainer(
+            menuController.getLoggedUsers().get(0).getUsername(),
+            menuController.getLoggedUsers().get(0).getHistory()
+        );
         
-        // Crear userContainer para el segundo usuario
-        HBox rightUserContainer = createUserContainer(menuController.getLoggedUsers().get(1).getUsername(), menuController.getLoggedUsers().get(1).getHistory());
+        HBox rightUserContainer = createUserContainer(
+            menuController.getLoggedUsers().get(1).getUsername(),
+            menuController.getLoggedUsers().get(1).getHistory()
+        );
 
-        // Posicionar userContainers en las esquinas superiores 
         BorderPane topPane = new BorderPane(); 
         topPane.setLeft(leftUserContainer); 
         topPane.setRight(rightUserContainer); 
@@ -191,15 +209,12 @@ public class MenuView extends Application implements IView {
 
         Button playBtn = new Button("PLAY"); 
         playBtn.setMaxWidth(125); 
-	    playBtn.setOnAction(e -> { 
-            navigationController.navigateToView("play");
-        }); 
+        playBtn.setOnAction(e -> navigationController.navigateToView("play"));
         UtilsMenuView.styleButton(playBtn, "black", "#333333", "white", "10px 0 10px 0"); 
         GridPane.setHalignment(playBtn, HPos.CENTER); 
         grid.add(playBtn, 0, 2, 1, 1); 
         mainPane.setCenter(grid); 
 
-        // Crear y mostrar la escena 
         Scene scene = new Scene(mainPane, 1080, 720); 
         this.scene = scene; 
         stage.setTitle("Navy Attack"); 
@@ -207,6 +222,14 @@ public class MenuView extends Application implements IView {
         stage.show(); 
     }
     
+    /**
+     * Crea un contenedor visual con la información de un usuario,
+     * incluyendo su nombre, historial y botones de acción.
+     *
+     * @param username nombre del usuario.
+     * @param history lista del historial de partidas del usuario.
+     * @return un {@link HBox} con los elementos visuales del usuario.
+     */
     private HBox createUserContainer(String username, List<History> history) {
         HBox userContainer = new HBox(10);
         userContainer.setAlignment(Pos.CENTER_LEFT);
@@ -236,6 +259,11 @@ public class MenuView extends Application implements IView {
         return userContainer;
     }
 
+    /**
+     * Obtiene la escena asociada a la vista del menú.
+     *
+     * @return la {@link Scene} correspondiente a la vista actual.
+     */
     @Override
     public Scene getScene() { 
         return scene; 

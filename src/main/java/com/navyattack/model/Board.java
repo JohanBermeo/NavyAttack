@@ -7,45 +7,43 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Representa el tablero de juego de Batalla Naval.
+ * Representa el tablero de juego de Batalla Naval en NavyAttack.
  * Esta clase es parte del MODELO DE DOMINIO y contiene:
  * - Estado del grid (celdas vacías, con barcos, impactadas, etc.)
  * - Colección de barcos colocados
  * - Lógica de validación y colocación de barcos
  * - Lógica de ataque y detección de impactos
+ * 
+ * El tablero tiene dimensiones estándar de 10x10 celdas y gestiona
+ * todos los aspectos del juego relacionados con la colocación de barcos
+ * y los ataques realizados.
  *
- * @author NavyAttack Team
- * @version 2.0
+ * @author Juan Manuel Otálora Hernández - Johan Stevan Bermeo Buitrago
+ * @version 1.0
  */
 public class Board {
 
-    // ==================== CONSTANTES ====================
-
     /**
-     * Tamaño estándar del tablero (10x10)
+     * Tamaño estándar del tablero (10x10 celdas).
      */
     public static final int BOARD_SIZE = 10;
 
-    // ==================== ATRIBUTOS ====================
-
     /**
-     * Grid que representa el estado de cada celda del tablero
+     * Grid bidimensional que representa el estado de cada celda del tablero.
+     * Cada celda puede estar vacía, ocupada por un barco, impactada o fallada.
      */
     private final CellState[][] grid;
 
     /**
-     * Lista de barcos que han sido colocados en el tablero
+     * Lista de barcos que han sido colocados en el tablero.
      */
     private final List<Ship> ships;
 
     /**
-     * Mapa que mantiene la cantidad disponible de cada tipo de barco
-     * Key: Tipo de barco
-     * Value: Cantidad disponible para colocar
+     * Mapa que mantiene la cantidad disponible de cada tipo de barco.
+     * La clave es el tipo de barco y el valor es la cantidad disponible para colocar.
      */
     private final Map<ShipType, Integer> availableShips;
-
-    // ==================== CONSTRUCTOR ====================
 
     /**
      * Constructor que inicializa un tablero vacío.
@@ -78,7 +76,7 @@ public class Board {
      * - 3 Destructores (Destroyer)
      * - 4 Submarinos (Submarine)
      *
-     * @return Map con las cantidades iniciales
+     * @return Map con las cantidades iniciales de cada tipo de barco
      */
     private Map<ShipType, Integer> initializeAvailableShips() {
         Map<ShipType, Integer> ships = new HashMap<>();
@@ -89,24 +87,22 @@ public class Board {
         return ships;
     }
 
-    // ==================== MÉTODOS DE VALIDACIÓN ====================
-
     /**
      * Verifica si una posición está dentro de los límites del tablero.
      *
      * @param row Fila a verificar
      * @param col Columna a verificar
-     * @return true si la posición es válida, false en caso contrario
+     * @return true si la posición es válida (dentro del tablero), false en caso contrario
      */
     private boolean isValidPosition(int row, int col) {
         return row >= 0 && row < BOARD_SIZE && col >= 0 && col < BOARD_SIZE;
     }
 
     /**
-     * Verifica si hay barcos disponibles de un tipo específico.
+     * Verifica si hay barcos disponibles de un tipo específico para colocar.
      *
      * @param type Tipo de barco a verificar
-     * @return true si hay al menos un barco disponible, false en caso contrario
+     * @return true si hay al menos un barco disponible de ese tipo, false en caso contrario
      */
     private boolean isShipTypeAvailable(ShipType type) {
         return availableShips.getOrDefault(type, 0) > 0;
@@ -117,12 +113,12 @@ public class Board {
      * Valida:
      * - Que haya barcos disponibles de ese tipo
      * - Que todas las posiciones estén dentro del tablero
-     * - Que todas las posiciones estén vacías (no haya otros barcos)
+     * - Que todas las posiciones estén vacías (sin otros barcos)
      *
      * @param ship Barco a colocar
-     * @param row Fila inicial
-     * @param col Columna inicial
-     * @return true si el barco puede colocarse, false en caso contrario
+     * @param row Fila inicial donde se colocará el barco
+     * @param col Columna inicial donde se colocará el barco
+     * @return true si el barco puede colocarse en esa posición, false en caso contrario
      */
     public boolean canPlaceShip(Ship ship, int row, int col) {
         // Validar que haya barcos disponibles de este tipo
@@ -152,19 +148,14 @@ public class Board {
         return true;
     }
 
-    // ==================== MÉTODOS DE COLOCACIÓN ====================
-
     /**
      * Coloca un barco en el tablero en la posición especificada.
-     *
-     * PRECONDICIONES:
-     * - El barco debe poder colocarse (validar con canPlaceShip primero)
-     * - Debe haber barcos disponibles de ese tipo
+     * Actualiza el grid, registra el barco y decrementa la cantidad disponible.
      *
      * @param ship Barco a colocar
-     * @param row Fila inicial
-     * @param col Columna inicial
-     * @throws IllegalStateException si el barco no puede colocarse
+     * @param row Fila inicial donde se colocará el barco
+     * @param col Columna inicial donde se colocará el barco
+     * @throws IllegalStateException si el barco no puede colocarse en esa posición
      */
     public void placeShip(Ship ship, int row, int col) {
         // Validar que se puede colocar
@@ -195,6 +186,7 @@ public class Board {
 
     /**
      * Decrementa la cantidad disponible de un tipo de barco.
+     * Se llama después de colocar exitosamente un barco en el tablero.
      *
      * @param type Tipo de barco a decrementar
      */
@@ -205,14 +197,14 @@ public class Board {
         }
     }
 
-    // ==================== MÉTODOS DE ATAQUE ====================
-
     /**
      * Procesa un ataque en una posición específica del tablero.
+     * Determina si el ataque impacta un barco, falla o es inválido.
+     * Actualiza el estado del grid y registra impactos en los barcos.
      *
      * @param row Fila atacada
      * @param col Columna atacada
-     * @return AttackResult indicando el resultado del ataque
+     * @return AttackResult indicando el resultado del ataque (HIT, MISS, SUNK, etc.)
      */
     public AttackResult attack(int row, int col) {
         // Validar que la posición sea válida
@@ -252,7 +244,7 @@ public class Board {
     }
 
     /**
-     * Encuentra el barco que ocupa una posición específica.
+     * Encuentra el barco que ocupa una posición específica del tablero.
      *
      * @param row Fila a buscar
      * @param col Columna a buscar
@@ -269,10 +261,9 @@ public class Board {
         return null;
     }
 
-    // ==================== MÉTODOS DE CONSULTA ====================
-
     /**
      * Verifica si todos los barcos en el tablero han sido hundidos.
+     * Condición de victoria para el oponente.
      *
      * @return true si todos los barcos están hundidos, false en caso contrario
      */
@@ -291,7 +282,7 @@ public class Board {
     }
 
     /**
-     * Obtiene la cantidad de barcos restantes de un tipo específico.
+     * Obtiene la cantidad de barcos restantes disponibles para colocar de un tipo específico.
      *
      * @param type Tipo de barco a consultar
      * @return Cantidad de barcos disponibles para colocar
@@ -301,12 +292,12 @@ public class Board {
     }
 
     /**
-     * Obtiene el estado de una celda específica.
+     * Obtiene el estado de una celda específica del tablero.
      *
      * @param row Fila de la celda
      * @param col Columna de la celda
-     * @return CellState de la celda
-     * @throws IndexOutOfBoundsException si la posición es inválida
+     * @return CellState de la celda especificada
+     * @throws IndexOutOfBoundsException si la posición está fuera de los límites del tablero
      */
     public CellState getCellState(int row, int col) {
         if (!isValidPosition(row, col)) {
@@ -327,9 +318,9 @@ public class Board {
     }
 
     /**
-     * Obtiene la cantidad total de barcos colocados.
+     * Obtiene la cantidad total de barcos colocados en el tablero.
      *
-     * @return Número de barcos en el tablero
+     * @return Número de barcos colocados
      */
     public int getPlacedShipsCount() {
         return ships.size();
@@ -351,6 +342,7 @@ public class Board {
 
     /**
      * Obtiene la cantidad total de celdas con barcos que aún no han sido impactadas.
+     * Útil para calcular el progreso del juego.
      *
      * @return Número de celdas con barcos intactas
      */
@@ -366,12 +358,11 @@ public class Board {
         return count;
     }
 
-    // ==================== MÉTODOS DE DEPURACIÓN ====================
-
     /**
-     * Genera una representación en String del tablero (útil para debugging).
+     * Genera una representación en String del tablero.
+     * Útil para debugging y testing.
      *
-     * @return String representando el estado del tablero
+     * @return String representando el estado completo del tablero
      */
     @Override
     public String toString() {
@@ -413,6 +404,7 @@ public class Board {
 
     /**
      * Reinicia el tablero a su estado inicial.
+     * Limpia el grid, elimina todos los barcos y restaura las cantidades disponibles.
      * Útil para tests o reiniciar el juego.
      */
     public void reset() {
@@ -427,6 +419,13 @@ public class Board {
         availableShips.putAll(initializeAvailableShips());
     }
 
+    /**
+     * Coloca barcos aleatoriamente en el tablero.
+     * Intenta colocar todos los barcos de todos los tipos en posiciones válidas aleatorias.
+     * Utiliza hasta 100 intentos por barco para encontrar una posición válida.
+     *
+     * @param board Tablero donde se colocarán los barcos aleatoriamente
+     */
     public static void placeShipsRandomly(Board board) {
         java.util.Random random = new java.util.Random();
 

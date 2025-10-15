@@ -15,40 +15,117 @@ import com.navyattack.controller.NavigationController;
 import com.navyattack.view.components.BoardGridComponent;
 
 /**
- * Vista para la fase de deployment (colocación de barcos).
- * Esta vista se muestra ANTES de iniciar la batalla.
+ * Vista para la fase de deployment (colocación de barcos) en NavyAttack.
+ * Esta vista se muestra antes de iniciar la batalla y permite al jugador
+ * colocar manualmente sus barcos en el tablero o generar una configuración aleatoria.
+ * 
+ * Proporciona una interfaz interactiva con un tablero para colocar barcos,
+ * botones para seleccionar tipos de barcos, controles de rotación y colocación,
+ * y contadores que muestran cuántos barcos de cada tipo quedan por colocar.
+ * 
+ * @author Juan Manuel Otálora Hernández - Johan Stevan Bermeo Buitrago
+ * @version 1.0
  */
 public class DeploymentView implements IView {
 
+    /**
+     * Escena de JavaFX que contiene la vista de deployment.
+     */
     private Scene scene;
+    
+    /**
+     * Componente de cuadrícula del tablero donde se colocan los barcos.
+     */
     private BoardGridComponent boardGrid;
+    
+    /**
+     * Controlador de navegación para cambiar entre vistas.
+     */
     private NavigationController menuController;
 
-    // Botones de deployment
+    /**
+     * Botón para volver al menú principal.
+     */
     private Button btnBack;
+    
+    /**
+     * Botón para generar un tablero con barcos colocados aleatoriamente.
+     */
     private Button btnRandom;
+    
+    /**
+     * Botón para iniciar el juego después de colocar todos los barcos.
+     */
     private Button btnStartGame;
+    
+    /**
+     * Botón para confirmar la colocación del barco seleccionado.
+     */
     private Button btnPlaceShip;
+    
+    /**
+     * Botón para rotar el barco seleccionado entre horizontal y vertical.
+     */
     private Button btnRotateShip;
+    
+    /**
+     * Botón para seleccionar y desplegar un portaviones.
+     */
     private Button btnDeployCarrier;
+    
+    /**
+     * Botón para seleccionar y desplegar un crucero.
+     */
     private Button btnDeployCruiser;
+    
+    /**
+     * Botón para seleccionar y desplegar un destructor.
+     */
     private Button btnDeployDestroyer;
+    
+    /**
+     * Botón para seleccionar y desplegar un submarino.
+     */
     private Button btnDeploySubmarine;
 
-    // Labels de contadores
+    /**
+     * Array de etiquetas que muestran la cantidad restante de cada tipo de barco.
+     */
     private Label[] shipCountLabels;
 
-    // Label de mensajes
+    /**
+     * Modo de juego actual (PVP o PVC).
+     */
     private String gameMode;
+    
+    /**
+     * Etiqueta para mostrar mensajes de estado y errores al usuario.
+     */
     private Label messageLabel;
+    
+    /**
+     * Nombre del jugador actual realizando el deployment.
+     */
     private String currentPlayer;
 
+    /**
+     * Constructor de la vista de deployment.
+     * 
+     * @param controller Controlador de navegación
+     * @param gameMode Modo de juego (PVP o PVC)
+     * @param currentPlayer Nombre del jugador actual
+     */
     public DeploymentView(NavigationController controller, String gameMode, String currentPlayer) {
         this.menuController = controller;
         this.gameMode = gameMode;
         this.currentPlayer = currentPlayer;
     }
 
+    /**
+     * Inicia y muestra la vista de deployment en el stage proporcionado.
+     * 
+     * @param primaryStage Stage donde se mostrará la vista
+     */
     @Override
     public void start(Stage primaryStage) {
         HBox mainLayout = new HBox(20);
@@ -70,6 +147,11 @@ public class DeploymentView implements IView {
         primaryStage.show();
     }
 
+    /**
+     * Crea el panel izquierdo que contiene el tablero de juego.
+     * 
+     * @return VBox con el tablero y títulos
+     */
     private VBox createBoardPanel() {
         VBox panel = new VBox(10);
         panel.setAlignment(Pos.CENTER);
@@ -90,6 +172,13 @@ public class DeploymentView implements IView {
         return panel;
     }
 
+    /**
+     * Crea el panel derecho que contiene los controles de deployment.
+     * Incluye botones de selección de barcos, controles de rotación y colocación,
+     * y opciones adicionales como tablero aleatorio.
+     * 
+     * @return VBox con todos los controles
+     */
     private VBox createControlPanel() {
         VBox panel = new VBox(15);
         panel.setAlignment(Pos.TOP_CENTER);
@@ -202,6 +291,14 @@ public class DeploymentView implements IView {
         return panel;
     }
 
+    /**
+     * Crea un botón para seleccionar un tipo específico de barco.
+     * Incluye un icono visual del barco, el botón de deployment y un contador.
+     * 
+     * @param type Tipo de barco
+     * @param index Índice del barco en el array de contadores
+     * @return HBox con el botón completo de selección de barco
+     */
     private HBox createShipButton(ShipType type, int index) {
         HBox container = new HBox(10);
         container.setAlignment(Pos.CENTER_LEFT);
@@ -231,8 +328,9 @@ public class DeploymentView implements IView {
     }
 
     /**
-     * Crea un icono visual simple para representar un barco.
-     *
+     * Crea un icono visual simple para representar un tipo de barco.
+     * Cada tipo de barco tiene un color distintivo.
+     * 
      * @param type Tipo de barco
      * @return Pane con la representación visual del barco
      */
@@ -276,10 +374,10 @@ public class DeploymentView implements IView {
     }
 
     /**
-     * Obtiene la cantidad inicial de barcos según el tipo.
-     *
+     * Obtiene la cantidad inicial de barcos disponibles según el tipo.
+     * 
      * @param type Tipo de barco
-     * @return Cantidad inicial
+     * @return Cantidad inicial de barcos de ese tipo
      */
     private int getInitialShipCount(ShipType type) {
         return switch (type) {
@@ -290,6 +388,12 @@ public class DeploymentView implements IView {
         };
     }
 
+    /**
+     * Aplica estilo visual a los botones de selección de barco.
+     * Incluye efectos hover para mejorar la experiencia de usuario.
+     * 
+     * @param btn Botón a estilizar
+     */
     private void styleShipButton(Button btn) {
         btn.setStyle(
                 "-fx-background-color: white;" +
@@ -318,6 +422,11 @@ public class DeploymentView implements IView {
         ));
     }
 
+    /**
+     * Aplica estilo visual a los botones de acción (rotar y colocar).
+     * 
+     * @param btn Botón a estilizar
+     */
     private void styleActionButton(Button btn) {
         btn.setStyle(
                 "-fx-background-color: #2c2c2c;" +
@@ -350,6 +459,11 @@ public class DeploymentView implements IView {
         ));
     }
 
+    /**
+     * Aplica estilo visual al botón de iniciar juego.
+     * 
+     * @param btn Botón a estilizar
+     */
     private void styleStartButton(Button btn) {
         btn.setStyle(
                 "-fx-background-color: #4CAF50;" +
@@ -382,49 +496,104 @@ public class DeploymentView implements IView {
         ));
     }
 
-    // ===== GETTERS PARA EL CONTROLADOR =====
-
+    /**
+     * Obtiene la escena de esta vista.
+     * 
+     * @return Escena de JavaFX
+     */
     @Override
     public Scene getScene() {
         return scene;
     }
 
+    /**
+     * Obtiene el componente de cuadrícula del tablero.
+     * 
+     * @return BoardGridComponent del tablero
+     */
     public BoardGridComponent getBoardGrid() {
         return boardGrid;
     }
 
+    /**
+     * Establece el manejador de eventos para el botón de desplegar portaviones.
+     * 
+     * @param handler Manejador de eventos
+     */
     public void setOnDeployCarrier(javafx.event.EventHandler<javafx.event.ActionEvent> handler) {
         btnDeployCarrier.setOnAction(handler);
     }
 
+    /**
+     * Establece el manejador de eventos para el botón de desplegar crucero.
+     * 
+     * @param handler Manejador de eventos
+     */
     public void setOnDeployCruiser(javafx.event.EventHandler<javafx.event.ActionEvent> handler) {
         btnDeployCruiser.setOnAction(handler);
     }
 
+    /**
+     * Establece el manejador de eventos para el botón de desplegar destructor.
+     * 
+     * @param handler Manejador de eventos
+     */
     public void setOnDeployDestroyer(javafx.event.EventHandler<javafx.event.ActionEvent> handler) {
         btnDeployDestroyer.setOnAction(handler);
     }
 
+    /**
+     * Establece el manejador de eventos para el botón de desplegar submarino.
+     * 
+     * @param handler Manejador de eventos
+     */
     public void setOnDeploySubmarine(javafx.event.EventHandler<javafx.event.ActionEvent> handler) {
         btnDeploySubmarine.setOnAction(handler);
     }
 
+    /**
+     * Establece el manejador de eventos para el botón de rotar barco.
+     * 
+     * @param handler Manejador de eventos
+     */
     public void setOnRotateShip(javafx.event.EventHandler<javafx.event.ActionEvent> handler) {
         btnRotateShip.setOnAction(handler);
     }
 
+    /**
+     * Establece el manejador de eventos para el botón de colocar barco.
+     * 
+     * @param handler Manejador de eventos
+     */
     public void setOnPlaceShip(javafx.event.EventHandler<javafx.event.ActionEvent> handler) {
         btnPlaceShip.setOnAction(handler);
     }
 
+    /**
+     * Establece el manejador de eventos para el botón de iniciar juego.
+     * 
+     * @param handler Manejador de eventos
+     */
     public void setOnStartGame(javafx.event.EventHandler<javafx.event.ActionEvent> handler) {
         btnStartGame.setOnAction(handler);
     }
 
+    /**
+     * Establece el manejador de eventos para el botón de tablero aleatorio.
+     * 
+     * @param handler Manejador de eventos
+     */
     public void setOnRandomBoard(javafx.event.EventHandler<javafx.event.ActionEvent> handler) {
         btnRandom.setOnAction(handler);
     }
 
+    /**
+     * Actualiza el contador de barcos disponibles para un tipo específico.
+     * Deshabilita el botón de deployment si no quedan barcos de ese tipo.
+     * 
+     * @param type Tipo de barco
+     * @param count Nueva cantidad de barcos disponibles
+     */
     public void updateShipCount(ShipType type, int count) {
         int index = type.ordinal();
         if (index >= 0 && index < shipCountLabels.length) {
@@ -441,6 +610,12 @@ public class DeploymentView implements IView {
         }
     }
 
+    /**
+     * Muestra un mensaje al usuario en la etiqueta de estado.
+     * 
+     * @param message Mensaje a mostrar
+     * @param isError true si es un mensaje de error, false si es informativo
+     */
     public void showMessage(String message, boolean isError) {
         messageLabel.setText(message);
         messageLabel.setTextFill(isError ?
@@ -449,10 +624,21 @@ public class DeploymentView implements IView {
         );
     }
 
+    /**
+     * Habilita o deshabilita el botón de colocar barco.
+     * 
+     * @param enable true para habilitar, false para deshabilitar
+     */
     public void enablePlaceButton(boolean enable) {
         btnPlaceShip.setDisable(!enable);
     }
 
+    /**
+     * Habilita o deshabilita el botón de iniciar juego.
+     * Muestra un mensaje de confirmación cuando se habilita.
+     * 
+     * @param enable true para habilitar, false para deshabilitar
+     */
     public void enableStartGameButton(boolean enable) {
         btnStartGame.setDisable(!enable);
         if (enable) {
@@ -460,10 +646,20 @@ public class DeploymentView implements IView {
         }
     }
 
+    /**
+     * Obtiene el modo de juego actual.
+     * 
+     * @return Modo de juego (PVP o PVC)
+     */
     public String getGameMode() {
         return gameMode;
     }
 
+    /**
+     * Obtiene el nombre del jugador actual.
+     * 
+     * @return Nombre del jugador
+     */
     public String getCurrentPlayer() {
         return currentPlayer;
     }

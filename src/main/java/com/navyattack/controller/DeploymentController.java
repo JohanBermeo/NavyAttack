@@ -9,17 +9,50 @@ import com.navyattack.view.components.BoardGridComponent;
 import java.util.List;
 
 /**
- * Controlador para la fase de deployment.
- * Coordina la colocación de barcos en el tablero.
+ * Controlador para la fase de deployment del juego NavyAttack.
+ * Coordina la colocación de barcos en el tablero y gestiona la interacción
+ * entre el modelo (Board) y la vista (DeploymentView).
+ * 
+ * @author Juan Manuel Otálora Hernández - Johan Stevan Bermeo Buitrago
+ * @version 1.0
  */
 public class DeploymentController {
 
+    /**
+     * Tablero donde se colocan los barcos del jugador actual.
+     */
     private final Board board;
+
+    /**
+     * Vista del deployment que muestra la interfaz gráfica.
+     */
     private final DeploymentView view;
+
+    /**
+     * Tablero del primer jugador en modo PVP.
+     * Se utiliza para almacenar temporalmente el tablero del jugador 1
+     * mientras el jugador 2 configura su tablero.
+     */
     private static Board player1Board = null;
+
+    /**
+     * Controlador de navegación para cambiar entre vistas.
+     */
     private final NavigationController controller;
+
+    /**
+     * Estado actual del deployment, incluyendo el barco seleccionado y su posición.
+     */
     private final DeploymentState deploymentState;
 
+    /**
+     * Constructor del controlador de deployment.
+     * Inicializa el controlador y conecta los manejadores de eventos.
+     * 
+     * @param board Tablero donde se colocarán los barcos
+     * @param view Vista del deployment
+     * @param controller Controlador de navegación
+     */
     public DeploymentController(Board board, DeploymentView view, NavigationController controller) {
         this.board = board;
         this.view = view;
@@ -30,6 +63,10 @@ public class DeploymentController {
         updateShipCounts();
     }
 
+    /**
+     * Conecta todos los manejadores de eventos de la vista con los métodos del controlador.
+     * Configura los listeners para los botones de despliegue, rotación, colocación y clicks en celdas.
+     */
     private void connectHandlers() {
         BoardGridComponent grid = view.getBoardGrid();
         grid.setCellClickHandler(this::handleCellClick);
@@ -44,6 +81,12 @@ public class DeploymentController {
         view.setOnRandomBoard(e -> handleStartWithRandomBoard());
     }
 
+    /**
+     * Maneja la selección de un tipo de barco para desplegar.
+     * Verifica que haya barcos disponibles del tipo seleccionado y actualiza el estado.
+     * 
+     * @param type Tipo de barco a desplegar
+     */
     private void handleDeployShip(ShipType type) {
         if (board.getRemainingShips(type) == 0) {
             view.showMessage("No more " + type.name() + " available", false);
@@ -55,6 +98,12 @@ public class DeploymentController {
         view.showMessage("Click on the board to place your " + type.name(), false);
     }
 
+    /**
+     * Maneja el click en una celda del tablero.
+     * Valida la posición seleccionada y muestra una previsualización del barco.
+     * 
+     * @param e Evento de acción generado por el click en la celda
+     */
     private void handleCellClick(ActionEvent e) {
         Object source = e.getSource();
         if (!(source instanceof Button btn)) return;
@@ -86,6 +135,10 @@ public class DeploymentController {
         }
     }
 
+    /**
+     * Maneja la rotación del barco seleccionado.
+     * Cambia la orientación entre horizontal y vertical y actualiza la previsualización.
+     */
     private void handleRotation() {
         if (!deploymentState.hasSelectedShip()) {
             view.showMessage("No ship selected to rotate", false);
@@ -102,6 +155,10 @@ public class DeploymentController {
         view.showMessage("Ship rotated", false);
     }
 
+    /**
+     * Maneja la colocación definitiva de un barco en el tablero.
+     * Valida la posición, coloca el barco en el tablero y actualiza la vista.
+     */
     private void handlePlacement() {
         if (!deploymentState.isReadyToPlace()) {
             view.showMessage("Select a position first", false);
@@ -133,6 +190,11 @@ public class DeploymentController {
         }
     }
 
+    /**
+     * Maneja el inicio del juego después de completar el deployment.
+     * En modo PVP, coordina el deployment de ambos jugadores.
+     * En modo Player vs CPU, navega directamente al juego.
+     */
     private void handleStartGame() {
         String gameMode = view.getGameMode();
 
@@ -154,6 +216,10 @@ public class DeploymentController {
         }
     }
 
+    /**
+     * Maneja el inicio del juego con un tablero aleatorio.
+     * Coloca todos los barcos automáticamente en posiciones aleatorias válidas.
+     */
     private void handleStartWithRandomBoard() {
         String gameMode = view.getGameMode();
 
@@ -177,6 +243,12 @@ public class DeploymentController {
         }
     }
 
+    /**
+     * Verifica si el deployment está completo.
+     * El deployment está completo cuando todos los tipos de barcos han sido colocados.
+     * 
+     * @return true si todos los barcos han sido colocados, false en caso contrario
+     */
     private boolean isDeploymentComplete() {
         for (ShipType type : ShipType.values()) {
             if (board.getRemainingShips(type) > 0) {
@@ -186,19 +258,35 @@ public class DeploymentController {
         return true;
     }
 
+    /**
+     * Actualiza los contadores de barcos disponibles en la vista.
+     * Muestra cuántos barcos de cada tipo quedan por colocar.
+     */
     private void updateShipCounts() {
         for (ShipType type : ShipType.values()) {
             view.updateShipCount(type, board.getRemainingShips(type));
         }
     }
 
-    // Helper para crear eventos mock (para recalcular preview)
+    /**
+     * Crea un evento mock para simular clicks en celdas.
+     * Utilizado para recalcular la previsualización después de rotar un barco.
+     * 
+     * @param row Fila de la celda
+     * @param col Columna de la celda
+     * @return Evento de acción simulado
+     */
     private ActionEvent createMockEvent(int row, int col) {
         Button mockButton = new Button();
         mockButton.setUserData(new int[]{row, col});
         return new ActionEvent(mockButton, null);
     }
 
+    /**
+     * Obtiene el tablero asociado a este controlador.
+     * 
+     * @return Tablero del jugador
+     */
     public Board getBoard() {
         return board;
     }

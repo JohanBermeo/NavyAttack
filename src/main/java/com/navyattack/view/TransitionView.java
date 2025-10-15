@@ -13,23 +13,45 @@ import javafx.scene.text.FontWeight;
 import com.navyattack.controller.NavigationController;
 
 /**
- * Vista de transición entre el deployment de jugadores.
- * Se muestra para que el jugador 2 pueda tomar el control sin ver
- * los barcos del jugador 1.
+ * Representa la vista de transición entre los jugadores durante el despliegue
+ * de barcos. Se muestra temporalmente para evitar que un jugador vea el tablero
+ * del oponente antes de iniciar su propio turno.
+ * 
+ * @author Juan Manuel Otálora Hernández - Johan Stevan Bermeo Buitrago
+ * @version 1.0
  */
 public class TransitionView implements IView {
 
+    /** Escena principal de la vista. */
     private Scene scene;
+
+    /** Modo de juego actual (por ejemplo, PVP o PVC). */
     private String gameMode;
+
+    /** Nombre del siguiente jugador que tomará el turno. */
     private String nextPlayer;
+
+    /** Controlador responsable de la navegación entre vistas. */
     private NavigationController menuController;
 
+    /**
+     * Crea una nueva vista de transición entre jugadores.
+     *
+     * @param controller  controlador de navegación
+     * @param nextPlayer  nombre del siguiente jugador
+     * @param gameMode    modo de juego actual
+     */
     public TransitionView(NavigationController controller, String nextPlayer, String gameMode) {
         this.menuController = controller;
         this.nextPlayer = nextPlayer;
         this.gameMode = gameMode;
     }
 
+    /**
+     * Inicializa y muestra la escena principal de la vista de transición.
+     *
+     * @param primaryStage ventana principal de la aplicación
+     */
     @Override
     public void start(Stage primaryStage) {
         VBox root = new VBox(30);
@@ -37,15 +59,12 @@ public class TransitionView implements IView {
         root.setPadding(new Insets(50));
         root.setStyle("-fx-background-color: #5872C9;");
 
-        // Título
         Label title = new Label("🎮 PLAYER TRANSITION 🎮");
         title.setFont(Font.font("Arial", FontWeight.BOLD, 32));
         title.setTextFill(javafx.scene.paint.Color.WHITE);
 
-        // Mensaje de transición
         VBox messageBox = createMessageBox();
 
-        // Botón para continuar
         Button btnContinue = new Button("I'M READY - START DEPLOYMENT");
         btnContinue.setPrefWidth(300);
         btnContinue.setPrefHeight(50);
@@ -60,6 +79,11 @@ public class TransitionView implements IView {
         primaryStage.show();
     }
 
+    /**
+     * Crea el contenedor con los mensajes de advertencia y transición.
+     *
+     * @return contenedor VBox con las instrucciones para el jugador
+     */
     private VBox createMessageBox() {
         VBox box = new VBox(15);
         box.setAlignment(Pos.CENTER);
@@ -97,6 +121,11 @@ public class TransitionView implements IView {
         return box;
     }
 
+    /**
+     * Aplica estilo visual al botón de continuar, incluyendo efectos de hover.
+     *
+     * @param btn botón al que se aplicará el estilo
+     */
     private void styleButton(Button btn) {
         btn.setStyle(
                 "-fx-background-color: #4CAF50;" +
@@ -125,10 +154,19 @@ public class TransitionView implements IView {
         ));
     }
 
+    /**
+     * Maneja la acción del botón "Continuar" redirigiendo al despliegue
+     * del segundo jugador según el modo de juego actual.
+     */
     private void handleContinue() {
         menuController.navigateToSecondPlayerDeployment(gameMode);
     }
 
+    /**
+     * Devuelve la escena asociada a esta vista.
+     *
+     * @return la escena actual
+     */
     @Override
     public Scene getScene() {
         return scene;

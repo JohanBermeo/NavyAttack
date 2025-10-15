@@ -1,75 +1,73 @@
 package com.navyattack.model;
 
 /**
- * Enumeración que representa los posibles resultados de un ataque en el juego.
- * @author NavyAttack Team
+ * Enumeración que representa los posibles resultados de un ataque en el juego NavyAttack.
+ * Define todos los estados posibles después de realizar un disparo en el tablero enemigo,
+ * incluyendo información visual, descripción y comportamiento asociado a cada resultado.
+ * 
+ * @author Juan Manuel Otálora Hernández - Johan Stevan Bermeo Buitrago
  * @version 1.0
  */
 public enum AttackResult {
 
     /**
      * El ataque impactó una celda vacía (agua).
-     * El jugador falló el disparo.
+     * El jugador falló el disparo y no dañó ningún barco.
      */
     MISS("Miss", "The attack hit water", "○"),
 
     /**
      * El ataque impactó parte de un barco.
-     * El barco fue dañado pero NO hundido.
+     * El barco fue dañado pero NO está completamente hundido.
      */
     HIT("Hit", "The attack hit a ship", "X"),
 
     /**
      * El ataque impactó y hundió completamente un barco.
-     * Todas las partes del barco han sido golpeadas.
+     * Todas las partes del barco han sido golpeadas exitosamente.
      */
     SUNK("Sunk", "The ship has been sunk", "💥"),
 
     /**
      * Se intentó atacar una celda que ya fue atacada previamente.
-     * No es un movimiento válido.
+     * No es un movimiento válido y no cuenta como turno.
      */
     ALREADY_ATTACKED("Already Attacked", "This position was already attacked", "⚠"),
 
     /**
-     * Posición inválida (fuera del tablero).
-     * No debería ocurrir con validación adecuada.
+     * Posición inválida (fuera de los límites del tablero).
+     * No debería ocurrir con validación adecuada en la interfaz.
      */
     INVALID_POSITION("Invalid Position", "Position is out of bounds", "✗");
 
-    // ==================== ATRIBUTOS ====================
-
     /**
-     * Nombre corto del resultado (para logs y UI simple)
+     * Nombre corto del resultado para logs y visualización simple en UI.
      */
     private final String displayName;
 
     /**
-     * Descripción detallada del resultado
+     * Descripción detallada del resultado del ataque.
      */
     private final String description;
 
     /**
-     * Símbolo visual para representar el resultado en la UI
+     * Símbolo visual para representar el resultado en la interfaz de usuario.
      */
     private final String symbol;
 
-    // ==================== CONSTRUCTOR ====================
-
     /**
      * Constructor privado del enum.
+     * Inicializa los atributos de cada resultado de ataque.
      *
      * @param displayName Nombre para mostrar en la UI
-     * @param description Descripción detallada
-     * @param symbol Símbolo visual
+     * @param description Descripción detallada del resultado
+     * @param symbol Símbolo visual del resultado
      */
     AttackResult(String displayName, String description, String symbol) {
         this.displayName = displayName;
         this.description = description;
         this.symbol = symbol;
     }
-
-    // ==================== GETTERS ====================
 
     /**
      * Obtiene el nombre para mostrar del resultado.
@@ -83,7 +81,7 @@ public enum AttackResult {
     /**
      * Obtiene la descripción detallada del resultado.
      *
-     * @return Descripción completa
+     * @return Descripción completa del resultado del ataque
      */
     public String getDescription() {
         return description;
@@ -98,19 +96,18 @@ public enum AttackResult {
         return symbol;
     }
 
-    // ==================== MÉTODOS DE UTILIDAD ====================
-
     /**
-     * Verifica si el resultado es un impacto exitoso (HIT o SUNK).
+     * Verifica si el resultado es un impacto exitoso.
+     * Considera exitosos tanto HIT como SUNK.
      *
-     * @return true si el ataque fue exitoso, false en caso contrario
+     * @return true si el ataque fue exitoso (HIT o SUNK), false en caso contrario
      */
     public boolean isSuccessfulHit() {
         return this == HIT || this == SUNK;
     }
 
     /**
-     * Verifica si el resultado terminó el juego para un barco (SUNK).
+     * Verifica si el resultado hundió completamente un barco.
      *
      * @return true si un barco fue hundido, false en caso contrario
      */
@@ -119,7 +116,8 @@ public enum AttackResult {
     }
 
     /**
-     * Verifica si el resultado es un movimiento inválido.
+     * Verifica si el resultado representa un movimiento inválido.
+     * Incluye intentos de atacar celdas ya atacadas o posiciones fuera del tablero.
      *
      * @return true si el movimiento no es válido, false en caso contrario
      */
@@ -129,7 +127,7 @@ public enum AttackResult {
 
     /**
      * Verifica si el resultado requiere cambio de turno.
-     * Solo ALREADY_ATTACKED e INVALID_POSITION no cambian el turno.
+     * Solo ALREADY_ATTACKED e INVALID_POSITION no provocan cambio de turno.
      *
      * @return true si debe cambiar el turno, false en caso contrario
      */
@@ -138,8 +136,8 @@ public enum AttackResult {
     }
 
     /**
-     * Obtiene el color asociado al resultado para la UI.
-     * Útil para colorear celdas según el resultado.
+     * Obtiene el código de color asociado al resultado para la UI.
+     * Útil para colorear celdas del tablero según el resultado del ataque.
      *
      * @return Código de color hexadecimal
      */
@@ -154,7 +152,9 @@ public enum AttackResult {
     }
 
     /**
-     * Obtiene puntos asociados al resultado (para sistema de puntuación).
+     * Obtiene puntos asociados al resultado para sistema de puntuación.
+     * MISS no otorga puntos, HIT otorga puntos moderados, SUNK otorga máximos puntos.
+     * ALREADY_ATTACKED aplica una penalización.
      *
      * @return Puntos obtenidos por este resultado
      */
@@ -169,18 +169,20 @@ public enum AttackResult {
     }
 
     /**
-     * Verifica si el resultado debe mostrarse con efecto especial.
+     * Verifica si el resultado debe mostrarse con efecto especial en la UI.
+     * Solo SUNK tiene efectos especiales (animaciones, sonidos, etc.).
      *
-     * @return true si debe tener animación/efecto especial
+     * @return true si debe tener animación o efecto especial
      */
     public boolean hasSpecialEffect() {
         return this == SUNK;
     }
 
     /**
-     * Obtiene un mensaje personalizado para el jugador.
+     * Obtiene un mensaje personalizado para mostrar al jugador.
+     * Incluye el nombre del barco si está disponible para mayor contexto.
      *
-     * @param shipName Nombre del barco (opcional, puede ser null)
+     * @param shipName Nombre del barco afectado (puede ser null)
      * @return Mensaje formateado para mostrar al jugador
      */
     public String getPlayerMessage(String shipName) {
@@ -200,22 +202,20 @@ public enum AttackResult {
     /**
      * Representación en String del resultado.
      *
-     * @return String con el nombre del resultado
+     * @return String con el nombre para mostrar del resultado
      */
     @Override
     public String toString() {
         return displayName;
     }
 
-    // ==================== MÉTODOS ESTÁTICOS ====================
-
     /**
-     * Obtiene un AttackResult basado en el estado de una celda y un barco.
-     * Método helper para determinar el resultado de un ataque.
+     * Obtiene un AttackResult basado en el estado de una celda y si el barco fue hundido.
+     * Método auxiliar para determinar el resultado correcto de un ataque.
      *
      * @param cellState Estado de la celda atacada
-     * @param shipSunk Si el barco fue hundido (true) o no (false)
-     * @return AttackResult correspondiente
+     * @param shipSunk Indica si el barco fue completamente hundido
+     * @return AttackResult correspondiente al ataque
      */
     public static AttackResult fromCellState(CellState cellState, boolean shipSunk) {
         return switch (cellState) {
@@ -227,7 +227,7 @@ public enum AttackResult {
 
     /**
      * Obtiene todos los resultados que son válidos para una jugada.
-     * Excluye INVALID_POSITION que es para manejo de errores.
+     * Excluye INVALID_POSITION que es solo para manejo de errores.
      *
      * @return Array de resultados válidos
      */
@@ -237,6 +237,7 @@ public enum AttackResult {
 
     /**
      * Obtiene todos los resultados que cuentan como jugadas exitosas.
+     * Solo incluye HIT y SUNK.
      *
      * @return Array de resultados exitosos
      */

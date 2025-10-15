@@ -10,12 +10,38 @@ import com.navyattack.view.*;
 import com.navyattack.model.User;
 import com.navyattack.model.Board;
 
+/**
+ * Controlador de navegación del juego NavyAttack.
+ * Gestiona la navegación entre las diferentes vistas de la aplicación,
+ * manteniendo un registro de vistas disponibles y coordinando las transiciones.
+ * Implementa el patrón Factory para la creación de vistas.
+ * 
+ * @author Juan Manuel Otálora Hernández - Johan Stevan Bermeo Buitrago
+ * @version 1.0
+ */
 public class NavigationController {
 
+   /**
+    * Vista actualmente mostrada en la aplicación.
+    */
    private IView currentView;
+   
+   /**
+    * Controlador del menú para gestionar datos de usuarios.
+    */
    private final MenuController menuController;
+   
+   /**
+    * Registro de vistas disponibles con sus factories correspondientes.
+    */
    private final Map<String, ViewFactory> viewRegistry;
 
+   /**
+    * Constructor del controlador de navegación.
+    * Inicializa el registro de vistas y registra las vistas por defecto.
+    * 
+    * @param menuController Controlador del menú para acceder a datos de usuarios
+    */
    public NavigationController(MenuController menuController) {
       this.menuController = menuController;
       this.viewRegistry = new HashMap<>();
@@ -24,7 +50,8 @@ public class NavigationController {
 
    /**
     * Registra todas las vistas por defecto del sistema.
-    * Este método puede ser extendido sin modificar el código existente.
+    * Este método puede ser extendido sin modificar el código existente,
+    * cumpliendo con el principio Open/Closed.
     */
    private void registerDefaultViews() {
       // Vistas de autenticación
@@ -41,9 +68,9 @@ public class NavigationController {
 
    /**
     * Permite registrar nuevas vistas sin modificar el código existente.
-    * Cumple con el principio Open/Closed.
+    * Cumple con el principio Open/Closed de SOLID.
     * 
-    * @param viewName Nombre único de la vista
+    * @param viewName Nombre único identificador de la vista
     * @param factory Factory que crea la instancia de la vista
     */
    public void registerView(String viewName, ViewFactory factory) {
@@ -52,6 +79,8 @@ public class NavigationController {
 
    /**
     * Obtiene el Stage actual desde la vista activa.
+    * 
+    * @return Stage actual, o null si no se pudo obtener
     */
    private Stage getCurrentStage() {
       if (currentView != null && currentView.getScene() != null) {
@@ -63,6 +92,9 @@ public class NavigationController {
 
    /**
     * Navega a una vista registrada por su nombre.
+    * Utiliza el factory registrado para crear la instancia de la vista.
+    * 
+    * @param viewName Nombre de la vista registrada
     */
    public void navigateToView(String viewName) {
       Stage stage = getCurrentStage();
@@ -80,7 +112,9 @@ public class NavigationController {
 
    /**
     * Navega a una vista específica ya instanciada.
-    * Útil para vistas que requieren parámetros dinámicos.
+    * Útil para vistas que requieren parámetros dinámicos no disponibles en el factory.
+    * 
+    * @param view Instancia de la vista a mostrar
     */
    public void navigateToView(IView view) {
       Stage stage = getCurrentStage();
@@ -90,10 +124,11 @@ public class NavigationController {
       currentView.start(stage);
    }
 
-   // ==================== MÉTODOS DE INICIALIZACIÓN ====================
-
    /**
     * Lanza la aplicación JavaFX.
+    * Método estático para iniciar el ciclo de vida de JavaFX.
+    * 
+    * @param args Argumentos de línea de comandos
     */
    public static void launchApp(String[] args) {
       Application.launch(NavigationApplication.class, args);
@@ -101,16 +136,20 @@ public class NavigationController {
 
    /**
     * Inicializa la primera vista de la aplicación.
+    * Muestra la pantalla de inicio de sesión al arrancar.
+    * 
+    * @param primaryStage Stage principal de JavaFX
     */
    public void initializeView(Stage primaryStage) {
       currentView = new LoginView(menuController, this);
       currentView.start(primaryStage);
    }
 
-   // ==================== MÉTODOS DE NAVEGACIÓN - VISTAS CON PARÁMETROS ====================
-
    /**
     * Navega a la vista de historial con datos específicos del usuario.
+    * 
+    * @param username Nombre del usuario cuyo historial se mostrará
+    * @param history Lista de partidas jugadas por el usuario
     */
    public void navigateToHistory(String username, java.util.List<com.navyattack.model.History> history) {
       IView historyView = new HistoryView(this, username, history);
@@ -119,6 +158,9 @@ public class NavigationController {
 
    /**
     * Navega a la vista de deployment (colocación de barcos) del primer jugador.
+    * Crea un nuevo tablero e inicializa el controlador de deployment.
+    * 
+    * @param gameMode Modo de juego seleccionado (PVP o PVC)
     */
    public void navigateToDeployment(String gameMode) {
       Stage stage = getCurrentStage();
@@ -137,6 +179,9 @@ public class NavigationController {
 
    /**
     * Navega a la vista de transición entre jugadores en modo PvP.
+    * Muestra una pantalla intermedia antes del deployment del segundo jugador.
+    * 
+    * @param gameMode Modo de juego (debe ser PVP)
     */
    public void navigateToTransition(String gameMode) {
       User nextPlayer = menuController.getLoggedUsers().size() > 1 ?
@@ -153,6 +198,9 @@ public class NavigationController {
 
    /**
     * Navega a la vista de deployment del segundo jugador en modo PvP.
+    * Crea el tablero del segundo jugador e inicializa su controlador de deployment.
+    * 
+    * @param gameMode Modo de juego (debe ser PVP)
     */
    public void navigateToSecondPlayerDeployment(String gameMode) {
       Stage stage = getCurrentStage();
@@ -176,6 +224,12 @@ public class NavigationController {
 
    /**
     * Navega a la vista principal del juego (batalla).
+    * Configura los tableros según el modo de juego e inicializa el controlador del juego.
+    * En modo PVC, genera automáticamente el tablero de la CPU.
+    * 
+    * @param player1Board Tablero del primer jugador
+    * @param player2Board Tablero del segundo jugador (puede ser null en modo PVC)
+    * @param gameMode Modo de juego (PVP o PVC)
     */
    public void navigateToGame(Board player1Board, Board player2Board, String gameMode) {
       Stage stage = getCurrentStage();
@@ -205,6 +259,16 @@ public class NavigationController {
 
    /**
     * Navega a la vista de victoria con todas las estadísticas de la partida.
+    * Muestra los resultados finales del juego incluyendo ganador, turnos y tiempo.
+    * 
+    * @param winner Nombre del jugador ganador
+    * @param loser Nombre del jugador perdedor
+    * @param gameMode Modo de juego jugado
+    * @param totalTurns Total de turnos transcurridos
+    * @param timePlayed Tiempo de juego en formato string
+    * @param timePlayedMillis Tiempo de juego en milisegundos
+    * @param winnerShipsSunk Número de barcos hundidos por el ganador
+    * @param loserShipsSunk Número de barcos hundidos por el perdedor
     */
    public void navigateToVictory(String winner, String loser, String gameMode, int totalTurns,
                                  String timePlayed, long timePlayedMillis,
@@ -215,10 +279,11 @@ public class NavigationController {
       navigateToView(victoryView);
    }
 
-   // ==================== MÉTODOS DE GESTIÓN DE USUARIOS ====================
-
    /**
     * Cierra la sesión de un usuario y navega a la vista apropiada.
+    * Si no quedan usuarios activos, vuelve al login. Si quedan usuarios, vuelve al menú.
+    * 
+    * @param username Nombre del usuario que cerrará sesión
     */
    public void logoutUser(String username) {
       menuController.logoutUser(username);
@@ -230,12 +295,20 @@ public class NavigationController {
       }
    }
 
-   // ==================== CLASE INTERNA ====================
-
    /**
     * Clase interna para iniciar la aplicación JavaFX.
+    * Extiende Application de JavaFX e inicializa el sistema de controladores.
+    * 
+    * @author Juan Manuel Otálora Hernández - Johan Stevan Bermeo Buitrago
+    * @version 1.0
     */
    public static class NavigationApplication extends Application {
+      /**
+       * Método de inicio de la aplicación JavaFX.
+       * Crea los controladores principales e inicializa la primera vista.
+       * 
+       * @param primaryStage Stage principal proporcionado por JavaFX
+       */
       @Override
       public void start(Stage primaryStage) {
          MenuController menuController = new MenuController();

@@ -11,16 +11,35 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 /**
- * Vista de transición entre turnos durante la batalla PVP.
- * Evita que los jugadores vean el tablero del oponente.
+ * Representa la vista de transición entre turnos durante la batalla PvP.
+ * Se utiliza para evitar que los jugadores vean el tablero del oponente
+ * antes de continuar con su turno.
+ * 
+ * @author Juan Manuel Otálora Hernández - Johan Stevan Bermeo Buitrago
+ * @version 1.0
  */
 public class TurnTransitionView {
 
+    /** Ventana principal donde se mostrará la vista. */
     private Stage stage;
-    private Scene originalGameScene;  // ✓ Guardar referencia a la escena del juego
+
+    /** Escena original del juego antes de la transición. */
+    private Scene originalGameScene;
+
+    /** Nombre del jugador que tomará el siguiente turno. */
     private String currentPlayerName;
+
+    /** Acción a ejecutar al continuar con el siguiente turno. */
     private Runnable onContinue;
 
+    /**
+     * Crea una nueva vista de transición entre turnos.
+     *
+     * @param stage              ventana principal donde se mostrará la vista
+     * @param originalGameScene  escena original del juego
+     * @param currentPlayerName  nombre del jugador actual
+     * @param onContinue         acción que se ejecutará al presionar continuar
+     */
     public TurnTransitionView(Stage stage, Scene originalGameScene, String currentPlayerName, Runnable onContinue) {
         this.stage = stage;
         this.originalGameScene = originalGameScene;
@@ -28,30 +47,29 @@ public class TurnTransitionView {
         this.onContinue = onContinue;
     }
 
+    /**
+     * Muestra la vista de transición en la ventana principal.
+     * Permite al jugador confirmar que el otro no está mirando antes de continuar.
+     */
     public void show() {
         VBox root = new VBox(30);
         root.setAlignment(Pos.CENTER);
         root.setPadding(new Insets(50));
         root.setStyle("-fx-background-color: #34495e;");
 
-        // Título
         Label title = new Label("⏸️ TURN CHANGE ⏸️");
         title.setFont(Font.font("Arial", FontWeight.BOLD, 32));
         title.setTextFill(javafx.scene.paint.Color.WHITE);
 
-        // Mensaje
         VBox messageBox = createMessageBox();
 
-        // Botón
         Button btnContinue = new Button("I'M READY - CONTINUE");
         btnContinue.setPrefWidth(250);
         btnContinue.setPrefHeight(50);
         styleButton(btnContinue);
         btnContinue.setOnAction(e -> {
-            // ✓ Restaurar la escena original del juego
             stage.setScene(originalGameScene);
 
-            // Ejecutar el callback
             if (onContinue != null) {
                 onContinue.run();
             }
@@ -63,6 +81,11 @@ public class TurnTransitionView {
         stage.setScene(transitionScene);
     }
 
+    /**
+     * Crea el cuadro de mensajes informativos que se muestra durante la transición.
+     *
+     * @return un contenedor VBox con las instrucciones visuales para el jugador
+     */
     private VBox createMessageBox() {
         VBox box = new VBox(15);
         box.setAlignment(Pos.CENTER);
@@ -94,6 +117,11 @@ public class TurnTransitionView {
         return box;
     }
 
+    /**
+     * Aplica estilo al botón principal, incluyendo color, tipografía y efectos de hover.
+     *
+     * @param btn botón al que se aplicará el estilo visual
+     */
     private void styleButton(Button btn) {
         btn.setStyle(
                 "-fx-background-color: #3498db;" +

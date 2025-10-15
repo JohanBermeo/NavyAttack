@@ -16,7 +16,14 @@ import com.navyattack.controller.NavigationController;
 
 /**
  * Vista que se muestra al finalizar una partida.
- * Muestra el ganador y estadísticas detalladas del juego.
+ * Presenta al jugador ganador, las estadísticas generales del enfrentamiento
+ * y un resumen de desempeño de ambos jugadores.
+ *
+ * <p>Permite al usuario regresar al menú principal o iniciar una nueva partida.</p>
+ * 
+ * @author Juan Manuel Otálora Hernández - 
+ *         Johan Stevan Bermeo Buitrago
+ * @version 1.0
  */
 public class VictoryView implements IView {
 
@@ -30,6 +37,19 @@ public class VictoryView implements IView {
     private int winnerShipsSunk;
     private NavigationController menuController;
 
+    /**
+     * Crea una vista de victoria con la información final del juego.
+     *
+     * @param controller       controlador de navegación para cambiar entre vistas
+     * @param winner           nombre del jugador ganador
+     * @param loser            nombre del jugador perdedor
+     * @param gameMode         modo de juego utilizado (PVC o PVP)
+     * @param totalTurns       número total de turnos jugados
+     * @param timePlayed       tiempo total de juego en formato legible
+     * @param timePlayedMillis tiempo total de juego en milisegundos
+     * @param winnerShipsSunk  número de barcos destruidos por el ganador
+     * @param loserShipsSunk   número de barcos destruidos por el perdedor
+     */
     public VictoryView(NavigationController controller, String winner, String loser, String gameMode,
                        int totalTurns, String timePlayed, long timePlayedMillis,
                        int winnerShipsSunk, int loserShipsSunk) {
@@ -43,6 +63,12 @@ public class VictoryView implements IView {
         this.loserShipsSunk = loserShipsSunk;
     }
 
+    /**
+     * Inicia la vista de victoria, construyendo la interfaz gráfica
+     * con los elementos de resumen y botones de navegación.
+     *
+     * @param primaryStage escenario principal de la aplicación
+     */
     @Override
     public void start(Stage primaryStage) {
         VBox root = new VBox(25);
@@ -50,28 +76,20 @@ public class VictoryView implements IView {
         root.setPadding(new Insets(40));
         root.setStyle("-fx-background-color: linear-gradient(to bottom, #2c3e50, #34495e);");
 
-        // Animación/Icono de victoria
         Label victoryIcon = new Label("🏆");
         victoryIcon.setFont(Font.font("Arial", 80));
 
-        // Título
         Label title = new Label("VICTORY!");
         title.setFont(Font.font("Arial", FontWeight.BOLD, 48));
         title.setTextFill(javafx.scene.paint.Color.web("#f39c12"));
 
-        // Nombre del ganador
         String winnerName = winner != null ? winner : "Player";
         Label winnerLabel = new Label(winnerName + " WINS!");
         winnerLabel.setFont(Font.font("Arial", FontWeight.BOLD, 32));
         winnerLabel.setTextFill(javafx.scene.paint.Color.WHITE);
 
-        // Estadísticas generales
         VBox generalStatsBox = createGeneralStatsBox();
-
-        // Estadísticas detalladas de jugadores
         HBox playersStatsBox = createPlayersStatsBox();
-
-        // Botones
         VBox buttonsBox = createButtonsBox();
 
         root.getChildren().addAll(victoryIcon, title, winnerLabel, generalStatsBox, playersStatsBox, buttonsBox);
@@ -82,6 +100,11 @@ public class VictoryView implements IView {
         primaryStage.show();
     }
 
+    /**
+     * Crea el contenedor de estadísticas generales del juego.
+     *
+     * @return un {@link VBox} con el resumen de modo, duración y turnos.
+     */
     private VBox createGeneralStatsBox() {
         VBox box = new VBox(12);
         box.setAlignment(Pos.CENTER);
@@ -99,26 +122,26 @@ public class VictoryView implements IView {
         statsTitle.setFont(Font.font("Arial", FontWeight.BOLD, 22));
         statsTitle.setTextFill(javafx.scene.paint.Color.YELLOW);
 
-        // Crear grid para las estadísticas
         GridPane statsGrid = new GridPane();
         statsGrid.setAlignment(Pos.CENTER);
         statsGrid.setHgap(20);
         statsGrid.setVgap(10);
 
-        // Modo de juego
         addStatRow(statsGrid, 0, "🎮 Game Mode:",
                 gameMode.equals("PVC") ? "Player vs CPU" : "Player vs Player");
-
-        // Tiempo de juego
         addStatRow(statsGrid, 1, "⏱ Game Duration:", timePlayed);
-
-        // Total de turnos
         addStatRow(statsGrid, 2, "🔄 Total Turns:", String.valueOf(totalTurns));
 
         box.getChildren().addAll(statsTitle, statsGrid);
         return box;
     }
 
+    /**
+     * Construye el contenedor de estadísticas individuales
+     * de cada jugador (ganador y perdedor).
+     *
+     * @return un {@link HBox} con las tarjetas de estadísticas de ambos jugadores.
+     */
     private HBox createPlayersStatsBox() {
         HBox container = new HBox(20);
         container.setAlignment(Pos.CENTER);
@@ -127,22 +150,28 @@ public class VictoryView implements IView {
         String winnerName = winner != null ? winner : "Player";
         String loserName = loser != null ? loser : (gameMode.equals("PVC") ? "CPU" : "Player 2");
 
-        // Estadísticas del ganador
         VBox winnerStats = createPlayerStatsCard(winnerName, winnerShipsSunk, loserShipsSunk, true);
 
-        // VS Label
         Label vsLabel = new Label("VS");
         vsLabel.setFont(Font.font("Arial", FontWeight.BOLD, 24));
         vsLabel.setTextFill(javafx.scene.paint.Color.WHITE);
         vsLabel.setPadding(new Insets(40, 0, 0, 0));
 
-        // Estadísticas del perdedor
         VBox loserStats = createPlayerStatsCard(loserName, loserShipsSunk, winnerShipsSunk, false);
 
         container.getChildren().addAll(winnerStats, vsLabel, loserStats);
         return container;
     }
 
+    /**
+     * Genera una tarjeta visual con las estadísticas de un jugador.
+     *
+     * @param playerName nombre del jugador
+     * @param shipsSunk  cantidad de barcos destruidos
+     * @param shipsLost  cantidad de barcos perdidos
+     * @param isWinner   indica si el jugador fue el ganador
+     * @return un {@link VBox} con la tarjeta de estadísticas del jugador
+     */
     private VBox createPlayerStatsCard(String playerName, int shipsSunk, int shipsLost, boolean isWinner) {
         VBox card = new VBox(10);
         card.setAlignment(Pos.CENTER);
@@ -160,7 +189,6 @@ public class VictoryView implements IView {
                         "-fx-border-radius: 15;"
         );
 
-        // Icono y nombre
         Label icon = new Label(isWinner ? "👑" : "💀");
         icon.setFont(Font.font("Arial", 32));
 
@@ -172,12 +200,9 @@ public class VictoryView implements IView {
         resultLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
         resultLabel.setTextFill(javafx.scene.paint.Color.web(isWinner ? "#27ae60" : "#e74c3c"));
 
-        // Separador
         javafx.scene.control.Separator separator = new javafx.scene.control.Separator();
         separator.setPrefWidth(200);
-        separator.setStyle("-fx-background-color: white;");
 
-        // Estadísticas
         VBox statsBox = new VBox(8);
         statsBox.setAlignment(Pos.CENTER_LEFT);
         statsBox.setPadding(new Insets(10, 20, 10, 20));
@@ -191,6 +216,14 @@ public class VictoryView implements IView {
         return card;
     }
 
+    /**
+     * Agrega una fila de estadística al panel de resumen.
+     *
+     * @param grid  panel donde se insertará la fila
+     * @param row   número de fila
+     * @param label descripción de la estadística
+     * @param value valor correspondiente
+     */
     private void addStatRow(GridPane grid, int row, String label, String value) {
         Label labelNode = new Label(label);
         labelNode.setFont(Font.font("Arial", FontWeight.BOLD, 16));
@@ -204,6 +237,13 @@ public class VictoryView implements IView {
         grid.add(valueNode, 1, row);
     }
 
+    /**
+     * Crea una etiqueta de estadística individual estilizada.
+     *
+     * @param text  texto de la etiqueta
+     * @param color color del texto
+     * @return un {@link Label} con el estilo configurado
+     */
     private Label createStatLabel(String text, String color) {
         Label label = new Label(text);
         label.setFont(Font.font("Arial", FontWeight.NORMAL, 14));
@@ -211,6 +251,11 @@ public class VictoryView implements IView {
         return label;
     }
 
+    /**
+     * Construye el contenedor de botones de acción (jugar nuevamente o volver al menú).
+     *
+     * @return un {@link VBox} con los botones configurados
+     */
     private VBox createButtonsBox() {
         VBox box = new VBox(15);
         box.setAlignment(Pos.CENTER);
@@ -229,6 +274,13 @@ public class VictoryView implements IView {
         return box;
     }
 
+    /**
+     * Aplica estilo visual a un botón, incluyendo color base y efecto hover.
+     *
+     * @param btn          botón a estilizar
+     * @param normalColor  color de fondo por defecto
+     * @param hoverColor   color de fondo al pasar el cursor
+     */
     private void styleButton(Button btn, String normalColor, String hoverColor) {
         btn.setStyle(
                 "-fx-background-color: " + normalColor + ";" +
@@ -257,10 +309,18 @@ public class VictoryView implements IView {
         ));
     }
 
+    /**
+     * Redirige al usuario a la vista de juego para comenzar una nueva partida.
+     */
     private void handlePlayAgain() {
         menuController.navigateToView("play");
     }
 
+    /**
+     * Obtiene la escena generada por esta vista.
+     *
+     * @return la {@link Scene} actual
+     */
     @Override
     public Scene getScene() {
         return scene;

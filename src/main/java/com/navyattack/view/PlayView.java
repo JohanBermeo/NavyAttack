@@ -19,17 +19,40 @@ import javafx.application.Application;
 import com.navyattack.controller.MenuController;
 import com.navyattack.controller.NavigationController;
 
+/**
+ * Clase que representa la vista de selección de modo de juego en NavyAttack.
+ * Permite al usuario elegir entre los modos "Player vs CPU" y "Player vs Player",
+ * con un diseño visual adaptado al número de usuarios registrados.
+ * 
+ * @author Juan Manuel Otálora Hernández - Johan Stevan Bermeo Buitrago
+ * @version 1.0
+ */
 public class PlayView extends Application implements IView {
     
+    /** Escena principal de la vista. */
     private Scene scene;
+    /** Controlador encargado de la lógica del menú principal. */
     private MenuController menuController;
+    /** Controlador encargado de la navegación entre vistas. */
     private NavigationController navigationController;
     
+    /**
+     * Constructor que inicializa la vista con sus controladores.
+     * 
+     * @param menuController controlador del menú principal.
+     * @param navigationController controlador de navegación entre vistas.
+     */
     public PlayView(MenuController menuController, NavigationController navigationController) {
         this.menuController = menuController;
         this.navigationController = navigationController;
     }
     
+    /**
+     * Inicializa la ventana principal de selección de modo de juego.
+     * Configura los botones interactivos y el estilo de la escena.
+     *
+     * @param primaryStage el {@link Stage} principal donde se mostrará la vista.
+     */
     @Override
     public void start(Stage primaryStage) {
         VBox root = new VBox();
@@ -48,9 +71,7 @@ public class PlayView extends Application implements IView {
         StackPane cardPlayerVsCPU = createCard(
             "Player vs CPU",
             "🤖",
-            () -> {
-                navigationController.navigateToDeployment("PVC");
-            }
+            () -> navigationController.navigateToDeployment("PVC")
         );
         cardPlayerVsCPU.setStyle(
             "-fx-background-color: #C95858;" +
@@ -73,27 +94,22 @@ public class PlayView extends Application implements IView {
 
         StackPane cardPlayerVsPlayer;
 
+        // Configura el modo PVP dependiendo del número de usuarios registrados
         if (!menuController.hasSingleUser()) {
-            // Caso: HAY DOS USUARIOS - Habilitar PVP
             cardPlayerVsPlayer = createCard(
-                    "Player vs Player",
-                    "👥",
-                    () -> {
-                        System.out.println("Iniciando modo Player vs Player");
-                        navigationController.navigateToDeployment("PVP");
-                    }
+                "Player vs Player",
+                "👥",
+                () -> navigationController.navigateToDeployment("PVP")
             );
 
-            // Estilo activo con gradiente de dos colores
             cardPlayerVsPlayer.setStyle(
-                    "-fx-background-color: linear-gradient(to right, #5872C9 0%, #5872C9 50%, #C95858 50%, #C95858 100%);" +
-                            "-fx-border-color: #FFFFFF;" +
-                            "-fx-background-radius: 10;" +
-                            "-fx-border-width: 2;" +
-                            "-fx-border-radius: 10;"
+                "-fx-background-color: linear-gradient(to right, #5872C9 0%, #5872C9 50%, #C95858 50%, #C95858 100%);" +
+                "-fx-border-color: #FFFFFF;" +
+                "-fx-background-radius: 10;" +
+                "-fx-border-width: 2;" +
+                "-fx-border-radius: 10;"
             );
 
-            // Efectos hover
             cardPlayerVsPlayer.setOnMouseEntered(e -> {
                 cardPlayerVsPlayer.setScaleX(1.05);
                 cardPlayerVsPlayer.setScaleY(1.05);
@@ -101,41 +117,28 @@ public class PlayView extends Application implements IView {
 
             cardPlayerVsPlayer.setOnMouseExited(e -> {
                 cardPlayerVsPlayer.setStyle(
-                        "-fx-background-color: linear-gradient(to right, #5872C9 0%, #5872C9 50%, #C95858 50%, #C95858 100%);" +
-                                "-fx-border-color: #FFFFFF;" +
-                                "-fx-background-radius: 10;" +
-                                "-fx-border-width: 2;" +
-                                "-fx-border-radius: 10;"
+                    "-fx-background-color: linear-gradient(to right, #5872C9 0%, #5872C9 50%, #C95858 50%, #C95858 100%);" +
+                    "-fx-border-color: #FFFFFF;" +
+                    "-fx-background-radius: 10;" +
+                    "-fx-border-width: 2;" +
+                    "-fx-border-radius: 10;"
                 );
                 cardPlayerVsPlayer.setScaleX(1.0);
                 cardPlayerVsPlayer.setScaleY(1.0);
             });
 
         } else {
-            // Caso: SOLO UN USUARIO - Deshabilitar PVP
-            cardPlayerVsPlayer = createCard(
-                    "Player vs Player",
-                    "👥",
-                    () -> {
-                        // No hacer nada (card deshabilitada)
-                    }
-            );
-
-            // Estilo deshabilitado (gris y semi-transparente)
+            // Modo deshabilitado si solo hay un usuario
+            cardPlayerVsPlayer = createCard("Player vs Player", "👥", () -> {});
             cardPlayerVsPlayer.setStyle(
-                    "-fx-background-color: #808080;" +
-                            "-fx-border-color: #FFFFFF;" +
-                            "-fx-background-radius: 10;" +
-                            "-fx-border-width: 2;" +
-                            "-fx-border-radius: 10;" +
-                            "-fx-opacity: 0.5;"
+                "-fx-background-color: #808080;" +
+                "-fx-border-color: #FFFFFF;" +
+                "-fx-background-radius: 10;" +
+                "-fx-border-width: 2;" +
+                "-fx-border-radius: 10;" +
+                "-fx-opacity: 0.5;"
             );
-
-            // Deshabilitar interacciones
             cardPlayerVsPlayer.setCursor(Cursor.DEFAULT);
-            cardPlayerVsPlayer.setOnMouseEntered(null);
-            cardPlayerVsPlayer.setOnMouseExited(null);
-            cardPlayerVsPlayer.setOnMouseClicked(null);
         }
         
         cardsContainer.getChildren().addAll(cardPlayerVsCPU, cardPlayerVsPlayer);       
@@ -144,13 +147,20 @@ public class PlayView extends Application implements IView {
         root.getChildren().addAll(title, cardsContainer, bottomPanel);
         
         scene = new Scene(root, 350, 450);
-        
         primaryStage.setTitle("NavyAttack - Play");
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
     }
     
+    /**
+     * Crea una tarjeta visual interactiva para seleccionar el modo de juego.
+     *
+     * @param text texto que describe el modo.
+     * @param emoji ícono visual representativo.
+     * @param action acción a ejecutar al hacer clic.
+     * @return un {@link StackPane} configurado como tarjeta.
+     */
     private StackPane createCard(String text, String emoji, Runnable action) {
         StackPane card = new StackPane();
         card.setPrefSize(200, 75);
@@ -185,6 +195,11 @@ public class PlayView extends Application implements IView {
         return card;
     }
     
+    /**
+     * Crea el panel inferior con el botón de retorno al menú principal.
+     *
+     * @return un {@link HBox} que contiene el botón de retorno.
+     */
     private HBox createBottomPanel() { 
         HBox bottomPanel = new HBox(); 
         bottomPanel.setAlignment(Pos.CENTER); 
@@ -193,14 +208,17 @@ public class PlayView extends Application implements IView {
         Button backButton = new Button("Return"); 
         backButton.setPrefWidth(150); 
         UtilsMenuView.styleButton(backButton, "black", "#333333", "white", "5px 0 5px 0");
-        backButton.setOnAction(e -> {
-            navigationController.navigateToView("menu");
-        }); 
+        backButton.setOnAction(e -> navigationController.navigateToView("menu")); 
 
         bottomPanel.getChildren().add(backButton); 
         return bottomPanel; 
     }
 
+    /**
+     * Retorna la escena actual asociada a la vista.
+     *
+     * @return la {@link Scene} principal de la vista.
+     */
     @Override
     public Scene getScene() { 
         return scene; 
