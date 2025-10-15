@@ -66,7 +66,7 @@ src/
 │   └── Ship.java
 ├── view/
 │   ├── components/
-│                ├── BoardGridComponent.java
+│       ├── BoardGridComponent.java
 │   ├── GameView.java
 │   ├── DeploymentView.java
 │   ├── HistoryView.java
