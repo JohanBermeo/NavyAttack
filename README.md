@@ -43,9 +43,17 @@ El primer jugador que logre hundir completamente todos los barcos enemigos será
 src/
 ├── controller/
 │   ├── MenuController.java
+│   ├── DeploymentController.java
 │   ├── GameController.java
+│   ├── DeploymentState.java
+│   ├── NavigationController.java
 ├── model/
+│   ├── CPU.java
 │   ├── Authentication.java
+│   ├── AttackResult.java
+│   ├── UserStatistics.java
+│   ├── Orientation.java
+│   ├── GameTimer.java
 │   ├── DataManager.java
 │   ├── User.java
 │   ├── History.java
@@ -53,11 +61,24 @@ src/
 │   ├── Game.java
 │   ├── Player.java
 │   ├── Board.java
-│   ├── Cell.java
+│   ├── CellState.java
+│   ├── ShipType.java
 │   └── Ship.java
 ├── view/
+│   ├── components/
+│                ├── BoardGridComponent.java
 │   ├── GameView.java
-│   ├── BoardView.java
+│   ├── DeploymentView.java
+│   ├── HistoryView.java
+│   ├── IView.java
+│   ├── LoginView.java
+│   ├── PlayView.java
+│   ├── SignUpView.java
+│   ├── TransitionView.java
+│   ├── TurnTransitionView.java
+│   ├── UtilsMenuView.java
+│   ├── VictoryView.java
+│   ├── ViewFactory.java
 │   └── MenuView.java
 └── main/
     └── NavyAttack.java
@@ -110,16 +131,6 @@ src/
 - [ ] Estadísticas de jugador
 - [ ] Modo multijugador en local
 - [ ] Modo de juego vs Machine
-
-## 🤝 Contribuciones
-
-Las contribuciones son bienvenidas. Para contribuir:
-
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
 
 ## 📝 Licencia
 

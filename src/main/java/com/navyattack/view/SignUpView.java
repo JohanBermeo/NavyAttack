@@ -109,7 +109,7 @@ public class SignUpView implements IView {
 		topPanel.setAlignment(Pos.CENTER_LEFT); 
 		topPanel.setPadding(new Insets(15, 15, 0, 15)); 
 				
-		ImageView backArrow = UtilsMenuView.createImage("file:docs/Icons/png/flecha-pequena-izquierda.png"); 
+		ImageView backArrow = UtilsMenuView.createImage("file:src/main/resources/images/icons/flecha-pequena-izquierda.png"); 
 		backArrow.setStyle("-fx-cursor: hand;");                   
 		backArrow.setOnMouseClicked(e -> navigationController.navigateToView("menu"));
 

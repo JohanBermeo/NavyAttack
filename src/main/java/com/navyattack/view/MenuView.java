@@ -75,7 +75,7 @@ public class MenuView extends Application implements IView {
     private void createSingleUserInterface(Stage stage) {
         BorderPane mainPane = new BorderPane();          
 
-        ImageView imageUser = UtilsMenuView.createImage("file:docs/Icons/png/user.png");  
+        ImageView imageUser = UtilsMenuView.createImage("file:src/main/resources/images/icons/user.png");  
 
         Text leftText = new Text("Usuario: " + menuController.getLoggedUsers().get(0).getUsername()); 
         leftText.setFont(Font.font("Tahoma", FontWeight.BOLD, 20));  
@@ -87,7 +87,7 @@ public class MenuView extends Application implements IView {
         leftContainer.setAlignment(Pos.CENTER_LEFT); 
         leftContainer.getChildren().addAll(imageUser, leftText); 
 
-        ImageView imageAdd = UtilsMenuView.createImage("file:docs/Icons/png/001-botn-agregar.png");
+        ImageView imageAdd = UtilsMenuView.createImage("file:src/main/resources/images/icons/001-botn-agregar.png");
         imageAdd.setStyle("-fx-cursor: hand;");
         imageAdd.setOnMouseClicked(event -> navigationController.navigateToView("login"));
 
@@ -242,7 +242,7 @@ public class MenuView extends Application implements IView {
             "-fx-border-radius: 10;"
         );
         
-        ImageView userIcon = UtilsMenuView.createImage("file:docs/Icons/png/user.png");
+        ImageView userIcon = UtilsMenuView.createImage("file:src/main/resources/images/icons/user.png");
         
         Text usernames = new Text(username);
         usernames.setFont(Font.font("Tahoma", FontWeight.BOLD, 15));
