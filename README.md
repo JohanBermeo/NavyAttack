@@ -146,7 +146,6 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 - Inspirado en el clásico juego Battleship
 - Agradecimientos especiales a la comunidad de Java
 
-Pruebasa
 ---
 
 ⭐ ¡No olvides darle una estrella al proyecto si te gusta!
